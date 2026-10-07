@@ -2,8 +2,7 @@ package com.kaio.limbus_api.entity;
 
 import com.kaio.limbus_api.enums.Rarity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 @Entity
 public class Identity {
@@ -13,14 +12,18 @@ public class Identity {
     private long id;
 
     @NotBlank
+    @Size(max = 100)
     private String nome;
 
-    @Size(min = 1, max = 4)
+    @Min(1)
+    @Max(4)
     private int uptie;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Rarity rarity;
 
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "sinner_id")
     private Sinner sinner;
