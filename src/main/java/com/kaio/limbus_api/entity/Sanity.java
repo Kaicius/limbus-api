@@ -1,11 +1,13 @@
 package com.kaio.limbus_api.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
+@Schema(description = "Sanity de uma Identity: Panic e fatores que aumentam ou diminuem a Sanity")
 public class Sanity {
 
     @Id
@@ -55,11 +57,11 @@ public class Sanity {
         this.panicType = panicType;
     }
 
-    public String getincreasingFactors() {
+    public String getIncreasingFactors() {
         return increasingFactors;
     }
 
-    public void setincreasingFactors(String increasingFactors) {
+    public void setIncreasingFactors(String increasingFactors) {
         this.increasingFactors = increasingFactors;
     }
 

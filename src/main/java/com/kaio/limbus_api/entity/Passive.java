@@ -1,12 +1,14 @@
 package com.kaio.limbus_api.entity;
 
 import com.kaio.limbus_api.enums.PassivaType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
+@Schema(description = "Passiva de uma Identity, de combate (BATTLE) ou suporte (SUPPORT)")
 public class Passive {
 
     @Id
