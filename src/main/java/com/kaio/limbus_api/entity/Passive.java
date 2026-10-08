@@ -13,24 +13,29 @@ public class Passive {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único, gerado pelo banco", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Tipo da Passiva: BATTLE (combate) ou SUPPORT (suporte)", example = "BATTLE")
     private PassivaType tipo;
 
     @NotBlank
     @Size(max = 255)
+    @Schema(description = "Nome da Passiva", example = "The Eye of Precognition", maxLength = 255)
     private String nome;
 
     @NotBlank
     @Column(length = 2000)
     @Size(max = 2000)
+    @Schema(description = "Descrição do efeito da Passiva", example = "[Turn Start] Gain Prescript...", maxLength = 2000)
     private String descricao;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "identity_id")
+    @Schema(description = "Identity dona da Passiva (relação N:1, definida pela URL)")
     private Identity identity;
 
     public Passive() {

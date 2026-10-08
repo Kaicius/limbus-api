@@ -18,9 +18,10 @@ public class Identity {
     private long id;
 
     @NotBlank
-    @Size(max = 100)
+    @Size(min = 2, max = 100)
     @Column(unique = true)
-    @Schema(description = "Nome da Identity (único)", example = "[The House of Spiders: The Index Nursefather] Yi Sang", maxLength = 100)
+    @Schema(description = "Nome da Identity (único), de 2 a 100 caracteres", example = "[The House of Spiders: The Index Nursefather] Yi Sang", minLength = 2, maxLength = 100)
+    @Pattern(regexp = "^(?=.*\\p{L}).+$", message = "deve conter letras (não pode ser só números ou símbolos)")
     private String nome;
 
     @Min(1)
@@ -30,11 +31,13 @@ public class Identity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Raridade: ZERO (0), ZERO_ZERO (00) ou ZERO_ZERO_ZERO (000)", example = "ZERO_ZERO_ZERO")
     private Rarity rarity;
 
     @NotNull
     @ManyToOne
     @JoinColumn(name = "sinner_id")
+    @Schema(description = "Sinner dono da Identity (relação N:1, definida pela URL)")
     private Sinner sinner;
 
     @NotEmpty
@@ -44,6 +47,7 @@ public class Identity {
             joinColumns = @JoinColumn(name = "identity_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
+    @Schema(description = "Tags da Identity (relação N:N, ao menos uma)")
     private Set<Tag> tags = new HashSet<>();
 
     public Identity() {

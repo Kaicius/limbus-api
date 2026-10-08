@@ -12,26 +12,31 @@ public class Sanity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único, gerado pelo banco", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
     @NotBlank
     @Size(max = 2000)
     @Column(length = 2000)
+    @Schema(description = "Descrição do Panic da Identity", example = "Does not act for this turn", maxLength = 2000)
     private String panicType;
 
     @NotBlank
     @Size(max = 2000)
     @Column(length = 2000)
+    @Schema(description = "O que faz a Sanity subir", example = "Increase by 10 after this unit defeats an enemy", maxLength = 2000)
     private String increasingFactors;
 
     @NotBlank
     @Size(max = 2000)
     @Column(length = 2000)
+    @Schema(description = "O que faz a Sanity cair", example = "Decrease when an ally is defeated", maxLength = 2000)
     private String decreasingFactors;
 
     @NotNull
     @OneToOne
     @JoinColumn(name = "identity_id", unique = true)
+    @Schema(description = "Identity dona da Sanity (relação 1:1, definida pela URL)")
     private Identity identity;
 
     public Sanity() {

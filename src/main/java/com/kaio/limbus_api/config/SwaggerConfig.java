@@ -29,8 +29,7 @@ public class SwaggerConfig {
                 .title("Limbus API")
                 .version("1.0.0")
                 .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
-                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.")
-                .contact(new Contact().name("Kaio Alves").email("kaioalvesesousa@gmail.com")))
+                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse."))
                 .tags(List.of(
                         new Tag().name("Sinners").description("Gerenciamento dos 12 Sinners da Limbus Company, os personagens jogáveis aos quais as Identities pertencem"),
                         new Tag().name("Tags").description("Gerenciamento das Tags temáticas das Identities, como 'The House of Spiders' ou 'The Pinky'"),

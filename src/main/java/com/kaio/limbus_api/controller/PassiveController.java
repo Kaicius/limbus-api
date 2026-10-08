@@ -50,7 +50,7 @@ public class PassiveController {
             description = "Retorna uma página com as Passivas cadastradas. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=id,desc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página retornada com sucesso (vazia se não houver nenhum registro)")
+            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)")
     })
     @GetMapping("/passives")
     public ResponseEntity<PagedModel<EntityModel<Passive>>> listar(
@@ -63,8 +63,8 @@ public class PassiveController {
             description = "Consulta personalizada: retorna as Passivas de um tipo, BATTLE (combate) ou SUPPORT (suporte)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página com as Passivas do tipo (vazia se não houver nenhuma)"),
-            @ApiResponse(responseCode = "400", description = "Parâmetro 'tipo' ausente ou com valor que não é um tipo válido",
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Passivas do tipo (vazia se não houver nenhuma)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Parâmetro 'tipo' ausente ou com valor que não é um tipo válido",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Tipo inválido", value = ErrorExamples.BAD_REQUEST_TIPO)))
@@ -82,12 +82,12 @@ public class PassiveController {
             description = "Retorna a Passiva a partir do seu identificador."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Passiva encontrado(a)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Passiva encontrado(a)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Passiva com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Passiva com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_PASSIVE)))
@@ -104,12 +104,12 @@ public class PassiveController {
             description = "Cria uma Passiva vinculada à Identity da URL. Uma Identity pode ter várias Passivas. A Identity precisa existir antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Passiva criado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (tipo inexistente, nome ou descrição em branco) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Passiva criado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (tipo inexistente, nome ou descrição em branco) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "A Identity da URL não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity da URL não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY)))
@@ -129,12 +129,12 @@ public class PassiveController {
             description = "Substitui todos os dados de uma Passiva existente. A Identity dona não pode ser alterada."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Passiva atualizado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Passiva atualizado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos, id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Passiva com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Passiva com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_PASSIVE)))
@@ -152,12 +152,12 @@ public class PassiveController {
             description = "Exclui a Passiva. A Identity continua existindo."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Passiva removido(a) com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Passiva removido(a) com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Passiva com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Passiva com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_PASSIVE)))

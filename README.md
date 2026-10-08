@@ -184,7 +184,7 @@ Cria um Sinner.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `nome` | `string` | **Required**. Nome do Sinner (único, 2 a 100 caracteres) |
+| `nome` | `string` | **Required**. Nome do Sinner (único, 2 a 100 caracteres, com letras) |
 
 **Status:** `201` Created · `400` Bad Request · `409` Conflict
 
@@ -197,7 +197,7 @@ Cria um Sinner.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id do Sinner a atualizar |
-| `nome` | `string` | **Required**. Nome do Sinner (único, 2 a 100 caracteres) |
+| `nome` | `string` | **Required**. Nome do Sinner (único, 2 a 100 caracteres, com letras) |
 
 **Status:** `200` OK · `400` Bad Request · `404` Not Found · `409` Conflict
 
@@ -272,7 +272,7 @@ Cria uma Tag.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `nome` | `string` | **Required**. Nome da Tag (único) |
+| `nome` | `string` | **Required**. Nome da Tag (único, 2 a 100 caracteres, com letras) |
 
 **Status:** `201` Created · `400` Bad Request · `409` Conflict
 
@@ -285,7 +285,7 @@ Cria uma Tag.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id da Tag a atualizar |
-| `nome` | `string` | **Required**. Nome da Tag (único) |
+| `nome` | `string` | **Required**. Nome da Tag (único, 2 a 100 caracteres, com letras) |
 
 **Status:** `200` OK · `400` Bad Request · `404` Not Found · `409` Conflict
 
@@ -378,10 +378,10 @@ O Sinner e as Tags precisam existir antes.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `sinnerId` | `integer` | **Required**. Id do Sinner dono (na URL) |
-| `nome` | `string` | **Required**. Nome da Identity (único, até 100 caracteres) |
+| `nome` | `string` | **Required**. Nome da Identity (único, 2 a 100 caracteres, com letras) |
 | `uptie` | `integer` | **Required**. Nível de uptie, de 1 a 4 |
 | `rarity` | `string` | **Required**. `ZERO` (0), `ZERO_ZERO` (00) ou `ZERO_ZERO_ZERO` (000) |
-| `tagIds` | `array<integer>` | **Required**. Ids das Tags da Identity (ao menos uma; as Tags precisam existir) |
+| `tagIds` | `array<integer>` | **Required**. Ids das Tags da Identity (de 1 a 10; as Tags precisam existir) |
 
 **Status:** `201` Created · `400` Bad Request · `404` Not Found · `409` Conflict
 
@@ -396,10 +396,10 @@ O Sinner dono não pode ser alterado.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id da Identity a atualizar |
-| `nome` | `string` | **Required**. Nome da Identity (único, até 100 caracteres) |
+| `nome` | `string` | **Required**. Nome da Identity (único, 2 a 100 caracteres, com letras) |
 | `uptie` | `integer` | **Required**. Nível de uptie, de 1 a 4 |
 | `rarity` | `string` | **Required**. `ZERO` (0), `ZERO_ZERO` (00) ou `ZERO_ZERO_ZERO` (000) |
-| `tagIds` | `array<integer>` | **Required**. Ids das Tags da Identity (ao menos uma; as Tags precisam existir) |
+| `tagIds` | `array<integer>` | **Required**. Ids das Tags da Identity (de 1 a 10; as Tags precisam existir) |
 
 **Status:** `200` OK · `400` Bad Request · `404` Not Found · `409` Conflict
 
@@ -472,10 +472,10 @@ Consulta personalizada por pecado.
 | :-------- | :------- | :------------------------- |
 | `identityId` | `integer` | **Required**. Id da Identity dona (na URL) |
 | `slot` | `string` | **Required**. `SKILL_1`, `SKILL_2`, `SKILL_3` ou `DEFESA` |
-| `variante` | `integer` | **Required**. Número da variante (mínimo 1) |
+| `variante` | `integer` | **Required**. Número da variante (1 a 10) |
 | `sin` | `string` | **Required**. `WRATH`, `LUST`, `SLOTH`, `GLOOM`, `GLUTTONY`, `ENVY` ou `PRIDE` |
-| `nome` | `string` | **Required**. Nome da Skill (até 255 caracteres) |
-| `quantidadeCoins` | `integer` | **Required**. Quantidade de moedas (mínimo 1) |
+| `nome` | `string` | **Required**. Nome da Skill (até 255 caracteres, com letras) |
+| `quantidadeCoins` | `integer` | **Required**. Quantidade de moedas (1 a 10) |
 | `descricaoEfeito` | `string` | **Required**. Descrição do efeito (até 2000 caracteres) |
 
 **Status:** `201` Created · `400` Bad Request · `404` Not Found
@@ -492,10 +492,10 @@ A Identity dona não pode ser alterada.
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id da Skill a atualizar |
 | `slot` | `string` | **Required**. `SKILL_1`, `SKILL_2`, `SKILL_3` ou `DEFESA` |
-| `variante` | `integer` | **Required**. Número da variante (mínimo 1) |
+| `variante` | `integer` | **Required**. Número da variante (1 a 10) |
 | `sin` | `string` | **Required**. `WRATH`, `LUST`, `SLOTH`, `GLOOM`, `GLUTTONY`, `ENVY` ou `PRIDE` |
-| `nome` | `string` | **Required**. Nome da Skill (até 255 caracteres) |
-| `quantidadeCoins` | `integer` | **Required**. Quantidade de moedas (mínimo 1) |
+| `nome` | `string` | **Required**. Nome da Skill (até 255 caracteres, com letras) |
+| `quantidadeCoins` | `integer` | **Required**. Quantidade de moedas (1 a 10) |
 | `descricaoEfeito` | `string` | **Required**. Descrição do efeito (até 2000 caracteres) |
 
 **Status:** `200` OK · `400` Bad Request · `404` Not Found
@@ -740,10 +740,10 @@ Uma Identity só pode ter um registro de Stats (409 se já existir).
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `identityId` | `integer` | **Required**. Id da Identity dona (na URL) |
-| `hp` | `integer` | **Required**. Pontos de vida (mínimo 1) |
-| `speed` | `string` | **Required**. Faixa de velocidade no formato `mín-máx`, ex.: `3-7` |
-| `defense` | `integer` | **Required**. Defesa (mínimo 0) |
-| `staggerThreshold` | `integer` | **Required**. Limiar de Stagger (mínimo 1) |
+| `hp` | `integer` | **Required**. Pontos de vida (1 a 99999) |
+| `speed` | `string` | **Required**. Faixa de velocidade no formato `mín-máx`, ex.: `3-7` (3 a 7 caracteres) |
+| `defense` | `integer` | **Required**. Defesa (0 a 9999) |
+| `staggerThreshold` | `integer` | **Required**. Limiar de Stagger (1 a 99999) |
 | `resistanceSlash` | `string` | **Required**. `INEFFECTIVE` (0.5x), `NORMAL` (1.0x), `WEAK` (1.5x) ou `FATAL` (2.0x) |
 | `resistancePierce` | `string` | **Required**. Mesmos valores de `resistanceSlash` |
 | `resistanceBlunt` | `string` | **Required**. Mesmos valores de `resistanceSlash` |
@@ -759,10 +759,10 @@ Uma Identity só pode ter um registro de Stats (409 se já existir).
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id dos Stats a atualizar |
-| `hp` | `integer` | **Required**. Pontos de vida (mínimo 1) |
-| `speed` | `string` | **Required**. Faixa de velocidade no formato `mín-máx`, ex.: `3-7` |
-| `defense` | `integer` | **Required**. Defesa (mínimo 0) |
-| `staggerThreshold` | `integer` | **Required**. Limiar de Stagger (mínimo 1) |
+| `hp` | `integer` | **Required**. Pontos de vida (1 a 99999) |
+| `speed` | `string` | **Required**. Faixa de velocidade no formato `mín-máx`, ex.: `3-7` (3 a 7 caracteres) |
+| `defense` | `integer` | **Required**. Defesa (0 a 9999) |
+| `staggerThreshold` | `integer` | **Required**. Limiar de Stagger (1 a 99999) |
 | `resistanceSlash` | `string` | **Required**. `INEFFECTIVE` (0.5x), `NORMAL` (1.0x), `WEAK` (1.5x) ou `FATAL` (2.0x) |
 | `resistancePierce` | `string` | **Required**. Mesmos valores de `resistanceSlash` |
 | `resistanceBlunt` | `string` | **Required**. Mesmos valores de `resistanceSlash` |

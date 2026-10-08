@@ -10,8 +10,9 @@ import java.util.Set;
 @Schema(description = "Dados para cadastrar ou atualizar uma Identity. O Sinner dono vem na URL, não no corpo.")
 public record IdentityRequest(
 
-        @Schema(description = "Nome da Identity", example = "[The House of Spiders: The Index Nursefather] Yi Sang")
-        @NotBlank @Size(max = 100)
+        @Schema(description = "Nome da Identity (único), de 2 a 100 caracteres", example = "[The House of Spiders: The Index Nursefather] Yi Sang", minLength = 2, maxLength = 100)
+        @NotBlank @Size(min = 2, max = 100)
+        @Pattern(regexp = "^(?=.*\\p{L}).+$", message = "deve conter letras (não pode ser só números ou símbolos)")
         String nome,
 
         @Schema(description = "Nível de uptie dos dados cadastrados (1 a 4)", example = "4", minimum = "1", maximum = "4")
@@ -23,7 +24,7 @@ public record IdentityRequest(
         Rarity rarity,
 
         @Schema(description = "Ids das Tags da Identity (ao menos uma). As Tags precisam existir antes.", example = "[1, 2, 3]")
-        @NotEmpty
+        @NotEmpty @Size(min = 1, max = 10)
         Set<@NotNull Long> tagIds
 ) {
     public Identity toEntity() {
