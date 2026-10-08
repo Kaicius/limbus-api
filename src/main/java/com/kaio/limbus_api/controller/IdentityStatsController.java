@@ -49,7 +49,7 @@ public class IdentityStatsController {
             description = "Retorna uma página com os Stats cadastrados. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=id,desc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página retornada com sucesso (vazia se não houver nenhum registro)")
+            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)")
     })
     @GetMapping("/identity-stats")
     public ResponseEntity<PagedModel<EntityModel<IdentityStats>>> listar(
@@ -62,12 +62,12 @@ public class IdentityStatsController {
             description = "Consulta personalizada: retorna os Stats vinculados à Identity informada. Cada Identity tem no máximo um registro de Stats (relação um-para-um)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Stats da Identity encontrados"),
-            @ApiResponse(responseCode = "400", description = "Id da Identity inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Stats da Identity encontrados"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id da Identity inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "A Identity não existe ou ainda não tem Stats cadastrados",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity não existe ou ainda não tem Stats cadastrados",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_STATS_IDENTITY)))
@@ -84,12 +84,12 @@ public class IdentityStatsController {
             description = "Retorna o Stats a partir do seu identificador."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Stats encontrado(a)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Stats encontrado(a)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Stats com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Stats com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_STATS)))
@@ -106,16 +106,16 @@ public class IdentityStatsController {
             description = "Cria os Stats da Identity da URL. Cada Identity só pode ter um registro de Stats; para alterar, use o PUT. A Identity precisa existir antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Stats criado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (HP ou Stagger abaixo de 1, velocidade fora do formato mín-máx, defesa negativa, resistência inexistente) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Stats criado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (HP ou Stagger fora de 1 a 99999, velocidade fora do formato mín-máx, defesa fora de 0 a 9999, resistência inexistente) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "A Identity da URL não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity da URL não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY))),
-            @ApiResponse(responseCode = "409", description = "A Identity já possui Stats cadastrados",
+            @ApiResponse(responseCode = "409", description = "Conflict – A Identity já possui Stats cadastrados",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -135,12 +135,12 @@ public class IdentityStatsController {
             description = "Substitui todos os valores de Stats de um registro existente. A Identity dona não pode ser alterada."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Stats atualizado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Stats atualizado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos, id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Stats com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Stats com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_STATS)))
@@ -158,12 +158,12 @@ public class IdentityStatsController {
             description = "Exclui o registro de Stats. A Identity continua existindo e pode receber novos Stats depois."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Stats removido(a) com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Stats removido(a) com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Stats com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Stats com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_STATS)))

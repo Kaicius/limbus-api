@@ -50,7 +50,7 @@ public class SkillController {
             description = "Retorna uma página com as Skills cadastradas. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=id,desc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página retornada com sucesso (vazia se não houver nenhum registro)")
+            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)")
     })
     @GetMapping("/skills")
     public ResponseEntity<PagedModel<EntityModel<Skill>>> listar(
@@ -63,8 +63,8 @@ public class SkillController {
             description = "Consulta personalizada: retorna as Skills de um determinado pecado (WRATH, LUST, SLOTH, GLOOM, GLUTTONY, ENVY ou PRIDE)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página com as Skills do pecado (vazia se não houver nenhuma)"),
-            @ApiResponse(responseCode = "400", description = "Parâmetro 'sin' ausente ou com valor que não é um pecado válido",
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Skills do pecado (vazia se não houver nenhuma)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Parâmetro 'sin' ausente ou com valor que não é um pecado válido",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Pecado inválido", value = ErrorExamples.BAD_REQUEST_SIN)))
@@ -82,12 +82,12 @@ public class SkillController {
             description = "Retorna a Skill a partir do seu identificador."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Skill encontrado(a)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Skill encontrado(a)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Skill com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Skill com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SKILL)))
@@ -104,12 +104,12 @@ public class SkillController {
             description = "Cria uma Skill vinculada à Identity da URL. Uma Identity pode ter várias Skills. A Identity precisa existir antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Skill criado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (slot ou pecado inexistente, variante ou moedas abaixo de 1, nome ou efeito em branco) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Skill criado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (slot ou pecado inexistente, variante ou moedas fora de 1 a 10, nome ou efeito em branco) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "A Identity da URL não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity da URL não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY)))
@@ -129,12 +129,12 @@ public class SkillController {
             description = "Substitui todos os dados de uma Skill existente. A Identity dona não pode ser alterada."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Skill atualizado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Skill atualizado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos, id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Skill com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Skill com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SKILL)))
@@ -152,12 +152,12 @@ public class SkillController {
             description = "Exclui a Skill. A Identity continua existindo."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Skill removido(a) com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Skill removido(a) com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Skill com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Skill com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SKILL)))

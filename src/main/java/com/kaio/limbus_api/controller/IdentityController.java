@@ -49,7 +49,7 @@ public class IdentityController {
             description = "Retorna uma página com as Identities cadastradas, já com o Sinner dono e as Tags. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=nome,asc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página de Identities retornada com sucesso (vazia se não houver nenhuma)")
+            @ApiResponse(responseCode = "200", description = "OK – Página de Identities retornada com sucesso (vazia se não houver nenhuma)")
     })
     @GetMapping("/identities")
     public ResponseEntity<PagedModel<EntityModel<Identity>>> listar(
@@ -62,8 +62,8 @@ public class IdentityController {
             description = "Consulta personalizada: retorna as Identities que pertencem ao Sinner informado. Se o Sinner não existir ou não tiver Identities, a página vem vazia."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página com as Identities do Sinner (vazia se não houver)"),
-            @ApiResponse(responseCode = "400", description = "Id do Sinner inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Identities do Sinner (vazia se não houver)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id do Sinner inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID)))
@@ -81,8 +81,8 @@ public class IdentityController {
             description = "Consulta personalizada: retorna as Identities que possuem a Tag de nome exato informado. Ex.: tag=The House of Spiders."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página com as Identities que possuem a Tag (vazia se nenhuma)"),
-            @ApiResponse(responseCode = "400", description = "Parâmetro 'tag' ausente",
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Identities que possuem a Tag (vazia se nenhuma)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Parâmetro 'tag' ausente",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Parâmetro ausente", value = ErrorExamples.BAD_REQUEST_PARAM_TAG)))
@@ -100,12 +100,12 @@ public class IdentityController {
             description = "Retorna uma única Identity, com o Sinner dono e a lista de Tags."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Identity encontrada"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Identity encontrada"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma Identity com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Identity com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY)))
@@ -122,16 +122,16 @@ public class IdentityController {
             description = "Cria uma Identity vinculada ao Sinner da URL. O corpo informa nome, uptie (1 a 4), raridade e os ids das Tags (ao menos uma). O Sinner e as Tags precisam existir antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Identity criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (nome em branco, uptie fora de 1 a 4, raridade inexistente, lista de Tags vazia) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Identity criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (nome em branco, uptie fora de 1 a 4, raridade inexistente, lista de Tags vazia ou com mais de 10) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "O Sinner da URL ou alguma das Tags informadas não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – O Sinner da URL ou alguma das Tags informadas não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SINNER))),
-            @ApiResponse(responseCode = "409", description = "Já existe outra Identity com esse nome",
+            @ApiResponse(responseCode = "409", description = "Conflict – Já existe outra Identity com esse nome",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -151,16 +151,16 @@ public class IdentityController {
             description = "Substitui nome, uptie, raridade e o conjunto de Tags de uma Identity. O Sinner dono não pode ser alterado."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Identity atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Identity atualizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos, id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "A Identity ou alguma das Tags informadas não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity ou alguma das Tags informadas não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY))),
-            @ApiResponse(responseCode = "409", description = "Já existe outra Identity com esse nome",
+            @ApiResponse(responseCode = "409", description = "Conflict – Já existe outra Identity com esse nome",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -178,16 +178,16 @@ public class IdentityController {
             description = "Exclui uma Identity. Só é possível se ela não tiver Skills, Passivas, Stats ou Sanity vinculados: remova esses registros antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Identity removida com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Identity removida com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma Identity com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Identity com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY))),
-            @ApiResponse(responseCode = "409", description = "A Identity possui Skills, Passivas, Stats ou Sanity vinculados",
+            @ApiResponse(responseCode = "409", description = "Conflict – A Identity possui Skills, Passivas, Stats ou Sanity vinculados",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))

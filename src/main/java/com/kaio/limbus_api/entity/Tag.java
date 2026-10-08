@@ -3,7 +3,9 @@ package com.kaio.limbus_api.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Schema(description = "Marcador temático de uma Identity, ex.: The House of Spiders")
@@ -17,8 +19,10 @@ public class Tag {
     private long id;
 
     @NotBlank
+    @Size(min = 2, max = 100)
     @Column(unique = true)
-    @Schema(description = "Nome da Tag (único)", example = "The Oracle's Proxy")
+    @Schema(description = "Nome da Tag (único), de 2 a 100 caracteres", example = "The Oracle's Proxy", minLength = 2, maxLength = 100)
+    @Pattern(regexp = "^(?=.*\\p{L}).+$", message = "deve conter letras (não pode ser só números ou símbolos)")
     private String nome;
 
     public Tag() {

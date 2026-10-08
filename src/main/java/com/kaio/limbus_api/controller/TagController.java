@@ -48,7 +48,7 @@ public class TagController {
             description = "Retorna uma página com as Tags cadastradas. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=nome,asc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página de Tags retornada com sucesso (vazia se não houver nenhuma)")
+            @ApiResponse(responseCode = "200", description = "OK – Página de Tags retornada com sucesso (vazia se não houver nenhuma)")
     })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Tag>>> listar(
@@ -61,8 +61,8 @@ public class TagController {
             description = "Consulta personalizada: retorna as Tags cujo nome contém o texto informado, sem diferenciar maiúsculas de minúsculas. Ex.: nome=spider encontra 'The House of Spiders'."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página com as Tags encontradas (vazia se nenhuma bater com o texto)"),
-            @ApiResponse(responseCode = "400", description = "Parâmetro 'nome' ausente",
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Tags encontradas (vazia se nenhuma bater com o texto)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Parâmetro 'nome' ausente",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Parâmetro ausente", value = ErrorExamples.BAD_REQUEST_PARAM_NOME)))
@@ -80,12 +80,12 @@ public class TagController {
             description = "Retorna os dados de uma única Tag a partir do seu identificador."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tag encontrada"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Tag encontrada"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma Tag com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Tag com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_TAG)))
@@ -102,12 +102,12 @@ public class TagController {
             description = "Cria uma Tag. O nome é obrigatório e único. Cadastre as Tags antes de criar Identities que as usem."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Tag criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (nome em branco) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Tag criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (nome em branco, fora de 2 a 100 caracteres ou sem letras) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "409", description = "Já existe uma Tag com esse nome",
+            @ApiResponse(responseCode = "409", description = "Conflict – Já existe uma Tag com esse nome",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -123,16 +123,16 @@ public class TagController {
             description = "Substitui o nome de uma Tag existente. As Identities que a usam passam a exibir o novo nome."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Tag atualizada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Tag atualizada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (nome em branco, fora de 2 a 100 caracteres ou sem letras), id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma Tag com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Tag com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_TAG))),
-            @ApiResponse(responseCode = "409", description = "Já existe outra Tag com esse nome",
+            @ApiResponse(responseCode = "409", description = "Conflict – Já existe outra Tag com esse nome",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -150,16 +150,16 @@ public class TagController {
             description = "Exclui uma Tag. Só é possível se nenhuma Identity a estiver usando."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Tag removida com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Tag removida com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhuma Tag com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Tag com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_TAG))),
-            @ApiResponse(responseCode = "409", description = "A Tag está vinculada a uma ou mais Identities",
+            @ApiResponse(responseCode = "409", description = "Conflict – A Tag está vinculada a uma ou mais Identities",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))

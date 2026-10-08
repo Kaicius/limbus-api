@@ -3,6 +3,8 @@ package com.kaio.limbus_api.entity;
 import com.kaio.limbus_api.enums.Resistance;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,36 +16,46 @@ public class IdentityStats {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único, gerado pelo banco", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
     private long id;
 
-    @Min(1)
+    @Min(1) @Max(99999)
+    @Schema(description = "Pontos de vida (HP)", example = "248", minimum = "1", maximum = "99999")
     private int hp;
 
     @NotBlank
+    @Size(min = 3, max = 7)
     @Pattern(regexp = "^[1-9]\\d*-[1-9]\\d*$", message = "deve estar no formato mín-máx, ex.: 3-7")
+    @Schema(description = "Faixa de velocidade no formato mín-máx (nunca um valor único)", example = "4-7", minLength = 3, maxLength = 7, pattern = "^[1-9]\\d*-[1-9]\\d*$")
     private String speed;
 
-    @Min(0)
+    @Min(0) @Max(9999)
+    @Schema(description = "Defesa", example = "65", minimum = "0", maximum = "9999")
     private int defense;
 
-    @Min(1)
+    @Min(1) @Max(99999)
+    @Schema(description = "Limiar de Stagger", example = "149", minimum = "1", maximum = "99999")
     private int staggerThreshold;
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Resistência a Slash: INEFFECTIVE (0.5x), NORMAL (1.0x), WEAK (1.5x) ou FATAL (2.0x)", example = "INEFFECTIVE")
     private Resistance resistanceSlash;
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Resistência a Pierce: INEFFECTIVE (0.5x), NORMAL (1.0x), WEAK (1.5x) ou FATAL (2.0x)", example = "NORMAL")
     private Resistance resistancePierce;
 
     @NotNull
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Resistência a Blunt: INEFFECTIVE (0.5x), NORMAL (1.0x), WEAK (1.5x) ou FATAL (2.0x)", example = "FATAL")
     private Resistance resistanceBlunt;
 
     @NotNull
     @OneToOne
     @JoinColumn(name = "identity_id", unique = true)
+    @Schema(description = "Identity dona destes Stats (relação 1:1, definida pela URL)")
     private Identity identity;
 
     public IdentityStats() {

@@ -49,7 +49,7 @@ public class SanityController {
             description = "Retorna uma página com as Sanities cadastradas. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=id,desc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Página retornada com sucesso (vazia se não houver nenhum registro)")
+            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)")
     })
     @GetMapping("/sanities")
     public ResponseEntity<PagedModel<EntityModel<Sanity>>> listar(
@@ -62,12 +62,12 @@ public class SanityController {
             description = "Consulta personalizada: retorna a Sanity (Panic, fatores que aumentam e que diminuem) vinculada à Identity informada. Cada Identity tem no máximo uma Sanity."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sanity da Identity encontrada"),
-            @ApiResponse(responseCode = "400", description = "Id da Identity inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Sanity da Identity encontrada"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id da Identity inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "A Identity não existe ou ainda não tem Sanity cadastrada",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity não existe ou ainda não tem Sanity cadastrada",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SANITY_IDENTITY)))
@@ -84,12 +84,12 @@ public class SanityController {
             description = "Retorna a Sanity a partir do seu identificador."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sanity encontrado(a)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "200", description = "OK – Sanity encontrado(a)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Sanity com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Sanity com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SANITY)))
@@ -106,16 +106,16 @@ public class SanityController {
             description = "Cria a Sanity da Identity da URL. Cada Identity só pode ter uma Sanity; para alterar, use o PUT. A Identity precisa existir antes."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Sanity criado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos (campo em branco ou acima de 2000 caracteres) ou JSON malformado",
+            @ApiResponse(responseCode = "201", description = "Created – Sanity criado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos (campo em branco ou acima de 2000 caracteres) ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "A Identity da URL não existe",
+            @ApiResponse(responseCode = "404", description = "Not Found – A Identity da URL não existe",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY))),
-            @ApiResponse(responseCode = "409", description = "A Identity já possui uma Sanity cadastrada",
+            @ApiResponse(responseCode = "409", description = "Conflict – A Identity já possui uma Sanity cadastrada",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Conflito", value = ErrorExamples.CONFLICT)))
@@ -135,12 +135,12 @@ public class SanityController {
             description = "Substitui o Panic e os fatores de Sanity de um registro existente. A Identity dona não pode ser alterada."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sanity atualizado(a) com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, id não numérico ou JSON malformado",
+            @ApiResponse(responseCode = "200", description = "OK – Sanity atualizado(a) com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Dados inválidos, id não numérico ou JSON malformado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Dados inválidos", value = ErrorExamples.BAD_REQUEST_VALIDATION))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Sanity com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Sanity com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SANITY)))
@@ -158,12 +158,12 @@ public class SanityController {
             description = "Exclui a Sanity. A Identity continua existindo."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Sanity removido(a) com sucesso (sem corpo)"),
-            @ApiResponse(responseCode = "400", description = "Id inválido (não numérico)",
+            @ApiResponse(responseCode = "204", description = "No Content – Sanity removido(a) com sucesso (sem corpo)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico)",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
-            @ApiResponse(responseCode = "404", description = "Nenhum(a) Sanity com o id informado",
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum(a) Sanity com o id informado",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SANITY)))
