@@ -783,6 +783,21 @@ Uma Identity só pode ter um registro de Stats (409 se já existir).
 
 **Status:** `204` No Content · `400` Bad Request · `404` Not Found
 
+## Termos de Serviço
+
+Esta API é um **projeto acadêmico e de fã (fan project)**, sem fins lucrativos, desenvolvido para a disciplina de Spring Boot (Senac TSI).
+
+- **Propriedade intelectual:** *Limbus Company*, seus personagens (Sinners), Identities, Skills, Passivas, nomes, imagens e demais elementos do jogo pertencem à **Project Moon**. Este projeto **não é afiliado, endossado ou patrocinado** pela Project Moon.
+- **Sem uso comercial:** a API existe apenas para fins de estudo e demonstração. Não deve ser usada para obter lucro nem para substituir os serviços oficiais do jogo.
+- **Dados:** os dados cadastrados são exemplos e podem estar incompletos ou incorretos. O banco é em memória (H2), então tudo é perdido ao reiniciar a aplicação.
+- **Sem garantias:** o serviço é fornecido "como está", sem garantia de disponibilidade, precisão ou adequação a qualquer finalidade. O autor não se responsabiliza por danos decorrentes do uso.
+- **Remoção de conteúdo:** se a Project Moon ou qualquer detentor de direitos quiser a remoção de algum conteúdo, basta entrar em contato pelo e-mail abaixo.
+
+## Licença
+
+O **código-fonte** deste projeto é distribuído sob a [MIT License](https://opensource.org/licenses/MIT). A licença cobre apenas o código; os materiais e a propriedade intelectual de *Limbus Company* continuam pertencendo à Project Moon.
+
+
 ## Autor
 
 Kaio Alves — Senac TSI.
