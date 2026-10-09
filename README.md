@@ -39,6 +39,8 @@ Console do H2: JDBC URL `jdbc:h2:mem:limbusdb`, usuário `sa`, senha em branco.
 
 A coleção está em [`postman/limbus-api.postman_collection.json`](postman/limbus-api.postman_collection.json): **54 requisições** (os 43 endpoints mais 11 casos de erro `400`, `404` e `409`), agrupadas por recurso.
 
+[`Link Site`](https://www.postman.com/kaioalvesesousa-7274103/limbus-api/collection/uorbhg5/limbus-api?action=share&creator=52699429)
+
 1. No Postman: **Import** → selecione o arquivo `.json`.
 2. Suba a aplicação (`http://localhost:8080`). A variável `baseUrl` já vem configurada.
 3. Rode as pastas de **1 a 8**, de cima para baixo (ou use o **Collection Runner**). Os ids criados são guardados automaticamente em variáveis (`sinnerId`, `identityId`, ...) e cada requisição tem um teste de status.
