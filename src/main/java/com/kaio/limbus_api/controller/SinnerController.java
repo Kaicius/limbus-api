@@ -49,7 +49,11 @@ public class SinnerController {
             description = "Retorna uma página com os Sinners cadastrados. Paginação via page (começa em 0), size e sort (ex.: sort=nome,asc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK – Página de Sinners retornada com sucesso (vazia se não houver nenhum cadastrado)")
+            @ApiResponse(responseCode = "200", description = "OK – Página de Sinners retornada com sucesso (vazia se não houver nenhum cadastrado)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Campo de ordenação (sort) inexistente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "Ordenação inválida", value = ErrorExamples.BAD_REQUEST_SORT)))
     })
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Sinner>>> listar(

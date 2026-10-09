@@ -3,7 +3,7 @@ package com.kaio.limbus_api.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.tags.Tag;
+import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
@@ -29,7 +29,15 @@ public class SwaggerConfig {
                 .title("Limbus API")
                 .version("1.0.0")
                 .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
-                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse."))
+                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.")
+                .termsOfService("https://github.com/Kaicius/limbus-api#termos-de-servi%C3%A7o")
+                .contact(new Contact()
+                        .name("Kaio Alves")
+                        .email("kaioalvesesousa@gmail.com")
+                        .url("https://github.com/Kaicius"))
+                .license(new License()
+                        .name("MIT License")
+                        .url("https://opensource.org/licenses/MIT")))
                 .tags(List.of(
                         new Tag().name("Sinners").description("Gerenciamento dos 12 Sinners da Limbus Company, os personagens jogáveis aos quais as Identities pertencem"),
                         new Tag().name("Tags").description("Gerenciamento das Tags temáticas das Identities, como 'The House of Spiders' ou 'The Pinky'"),

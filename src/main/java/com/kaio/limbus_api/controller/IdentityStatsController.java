@@ -49,7 +49,11 @@ public class IdentityStatsController {
             description = "Retorna uma página com os Stats cadastrados. Paginação via page (começa em 0), size (padrão 10) e sort (ex.: sort=id,desc)."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)")
+            @ApiResponse(responseCode = "200", description = "OK – Página retornada com sucesso (vazia se não houver nenhum registro)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Campo de ordenação (sort) inexistente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "Ordenação inválida", value = ErrorExamples.BAD_REQUEST_SORT)))
     })
     @GetMapping("/identity-stats")
     public ResponseEntity<PagedModel<EntityModel<IdentityStats>>> listar(

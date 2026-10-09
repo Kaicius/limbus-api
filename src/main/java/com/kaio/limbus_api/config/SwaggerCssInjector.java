@@ -19,6 +19,22 @@ import java.util.stream.Collectors;
 
 public class SwaggerCssInjector extends SwaggerIndexPageTransformer {
 
+    // O Swagger UI monta os textos dos links de contato sozinho ("<nome> - Website" e
+    // "Send email to <nome>"). Este script troca esses textos depois que a página renderiza.
+    private static final String SCRIPT_CONTATO = "<script>"
+            + "(function(){"
+            + "function ajustar(){"
+            + "var c=document.querySelector('.swagger-ui .info .info__contact');"
+            + "if(!c)return false;"
+            + "c.querySelectorAll('a').forEach(function(a){"
+            + "var t=(a.getAttribute('href')||'').indexOf('mailto:')===0?'Contact':'GitHub';"
+            + "if(a.textContent!==t){a.textContent=t;}"
+            + "});"
+            + "return true;}"
+            + "new MutationObserver(function(){ajustar();}).observe(document.documentElement,{childList:true,subtree:true});"
+            + "})();"
+            + "</script>";
+
     public SwaggerCssInjector(SwaggerUiConfigProperties swaggerUiConfig,
                               SwaggerUiOAuthProperties swaggerUiOAuthProperties,
                               SwaggerWelcomeCommon swaggerWelcomeCommon,
@@ -39,7 +55,8 @@ public class SwaggerCssInjector extends SwaggerIndexPageTransformer {
                         .replaceAll("<link[^>]*rel=\"icon\"[^>]*>", "")
                         .replace("</head>",
                         "<link rel=\"icon\" type=\"image/png\" href=\"/limbus-logo.png\" />"
-                        + "<link rel=\"stylesheet\" type=\"text/css\" href=\"/swagger-theme.css\" /></head>");
+                        + "<link rel=\"stylesheet\" type=\"text/css\" href=\"/swagger-theme.css\" />"
+                        + SCRIPT_CONTATO + "</head>");
                 return new TransformedResource(resource, transformado.getBytes());
             }
         }

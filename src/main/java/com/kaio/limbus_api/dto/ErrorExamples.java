@@ -50,4 +50,7 @@ public final class ErrorExamples {
 
     public static final String BAD_REQUEST_TIPO = """
             {"status": 400, "erro": "Bad Request", "mensagem": "Parâmetro 'tipo' com valor inválido: ATTACK", "timestamp": "2026-10-08T00:54:40"}""";
+
+    public static final String BAD_REQUEST_SORT = """
+            {"status": 400, "erro": "Bad Request", "mensagem": "Campo de ordenação inexistente: abc", "timestamp": "2026-10-08T00:54:40"}""";
 }
