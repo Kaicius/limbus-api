@@ -1,8 +1,8 @@
 # Limbus-API
 
-API REST estilo wiki da **Limbus Company**, feita com Spring Boot. Cadastra e consulta Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity, com paginação, validação, documentação Swagger e links HATEOAS.
+API REST estilo wiki da **Limbus Company**, feita com Spring Boot. Cadastra e consulta Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity, com paginação, validação, documentação Swagger e links HATEOAS. Na Parte 2 ganhou idempotência, rate limiting, versionamento por cabeçalho e CORS, e passou a ser consumida por um front em Angular ([limbus-web](https://github.com/Kaicius/limbus-web)).
 
-> Projeto da disciplina de Spring Boot (Senac TSI) — **Parte 1**.
+> Projeto da disciplina de Spring Boot (Senac TSI) — **Partes 1 e 2**.
 
 ## Tecnologias
 
@@ -10,12 +10,23 @@ API REST estilo wiki da **Limbus Company**, feita com Spring Boot. Cadastra e co
 - Spring Web MVC · Spring Data JPA · Hibernate
 - Bean Validation (Jakarta Validation)
 - Spring HATEOAS (formato HAL)
-- H2 (banco em memória)
+- MySQL 8 (H2 em memória apenas nos testes)
 - Springdoc OpenAPI / Swagger UI 3.1.1 (com tema customizado)
+- Bucket4j 8.21 (rate limiting com token bucket)
 
 ## Como executar
 
-Requisitos: **JDK 21 ou superior**. O Maven já vem junto no projeto (`mvnw`).
+Requisitos: **JDK 21 ou superior** e **MySQL 8** rodando em `localhost:3306`. O Maven já vem junto no projeto (`mvnw`).
+
+O banco `limbusdb` e as tabelas são criados automaticamente na primeira execução. O usuário e a senha do MySQL vêm das variáveis de ambiente `DB_USER` (padrão `root`) e `DB_PASSWORD` (padrão vazio):
+
+```bash
+# Linux / macOS
+export DB_PASSWORD=sua_senha
+
+# Windows (PowerShell)
+$env:DB_PASSWORD = "sua_senha"
+```
 
 ```bash
 # Linux / macOS
@@ -31,21 +42,18 @@ A API sobe em `http://localhost:8080`.
 | :-- | :-- |
 | Swagger UI | http://localhost:8080/swagger-ui/index.html |
 | OpenAPI (JSON) | http://localhost:8080/v3/api-docs |
-| Console do H2 | http://localhost:8080/h2-console |
-
-Console do H2: JDBC URL `jdbc:h2:mem:limbusdb`, usuário `sa`, senha em branco.
 
 ### Coleção do Postman
 
-A coleção está em [`postman/limbus-api.postman_collection.json`](postman/limbus-api.postman_collection.json): **54 requisições** (os 43 endpoints mais 11 casos de erro `400`, `404` e `409`), agrupadas por recurso.
+A coleção está em [`postman/limbus-api.postman_collection.json`](postman/limbus-api.postman_collection.json): **65 requisições** (os endpoints da Parte 1, seus casos de erro `400`, `404` e `409`, e a pasta 8 com os recursos da Parte 2), agrupadas por recurso. Todo `POST` já envia `X-Idempotency-Key: {{$guid}}`.
 
 1. No Postman: **Import** → selecione o arquivo `.json`.
 2. Suba a aplicação (`http://localhost:8080`). A variável `baseUrl` já vem configurada.
-3. Rode as pastas de **1 a 8**, de cima para baixo (ou use o **Collection Runner**). Os ids criados são guardados automaticamente em variáveis (`sinnerId`, `identityId`, ...) e cada requisição tem um teste de status.
+3. Rode as pastas de **1 a 9**, de cima para baixo (ou use o **Collection Runner**). Os ids criados são guardados automaticamente em variáveis (`sinnerId`, `identityId`, ...) e cada requisição tem um teste de status.
 
 ### Dados iniciais
 
-O H2 é **em memória**: os dados somem ao encerrar a aplicação. Por isso, ao subir, a classe `LoadDatabase` com `app.seed.enable=true` cadastra automaticamente:
+Os dados ficam gravados no MySQL e continuam lá entre uma execução e outra. Com `app.seed.enabled=true`, a classe `LoadDatabase` cadastra automaticamente, se o banco ainda estiver vazio:
 
 - os 12 Sinners;
 - as Tags *The House of Spiders*, *The Fingers*, *The Index* e *The Thumb*;
@@ -121,11 +129,77 @@ Todo erro tem o mesmo corpo:
 | `204 No Content` | Remoção bem-sucedida |
 | `400 Bad Request` | Validação falhou, JSON malformado, id ou enum inválido, parâmetro ausente |
 | `404 Not Found` | Recurso (ou Sinner/Identity/Tag referenciado) não existe |
-| `409 Conflict` | Valor único duplicado ou recurso ainda em uso |
+| `409 Conflict` | Valor único duplicado, recurso ainda em uso ou `X-Idempotency-Key` ainda em processamento |
+| `422 Unprocessable Content` | `X-Idempotency-Key` reutilizada com um corpo diferente |
+| `429 Too Many Requests` | Limite de requisições excedido (veja `Retry-After`) |
+
+## Recursos avançados (Parte 2)
+
+Os três primeiros são **filtros** (`filter/`), que rodam antes dos controllers, nesta ordem: CORS → rate limit → idempotência.
+
+### Idempotência (`X-Idempotency-Key`)
+
+Todo `POST` exige o cabeçalho `X-Idempotency-Key` com uma chave única por operação (ex.: um UUID). Assim, se o cliente reenviar a mesma requisição (duplo clique, timeout, retry), nada é criado duas vezes.
+
+| Situação | Resposta |
+| :-- | :-- |
+| Chave nova | Processa normalmente e guarda a resposta de sucesso (por 24 h) |
+| Mesma chave + mesmo corpo | Devolve a resposta guardada, com o header `Idempotent-Replayed: true` (o controller não roda) |
+| Mesma chave + corpo diferente | `422 Unprocessable Content` |
+| Mesma chave ainda em processamento | `409 Conflict` |
+| `POST` sem a chave | `400 Bad Request` |
+
+```bash
+curl -i -X POST http://localhost:8080/sinners \
+  -H "Content-Type: application/json" \
+  -H "X-Idempotency-Key: 3f2b8c1e-9d4a-4c7e-b1a2-6e5f0d9c8a71" \
+  -d '{"nome": "Dante"}'
+# rode de novo: mesmo 201, mesmo id e Idempotent-Replayed: true
+```
+
+`GET`, `PUT` e `DELETE` já são idempotentes por definição, por isso só o `POST` usa a chave. As chaves ficam em memória (`IdempotencyFilter`).
+
+### Rate limiting (token bucket)
+
+Cada cliente (IP) tem um "balde" com **20 fichas**; cada requisição gasta uma e as fichas voltam aos poucos (20 a cada 60 s, ou seja, uma a cada 3 s). Implementado com **Bucket4j** no `RateLimitFilter`.
+
+| Header de resposta | Significado |
+| :-- | :-- |
+| `X-Rate-Limit-Limit` | Capacidade do balde |
+| `X-Rate-Limit-Remaining` | Fichas restantes |
+| `Retry-After` | Só no `429`: segundos até poder tentar de novo |
+
+Balde vazio → `429 Too Many Requests`. Os valores ficam no `application.properties` (`app.rate-limit.capacity` e `app.rate-limit.window-seconds`).
+
+### Versionamento (`X-API-Version`)
+
+A versão é escolhida pelo cabeçalho `X-API-Version`, usando o versionamento nativo do Spring Framework 7 (`ApiVersionConfig`). Sem o cabeçalho vale a **versão 1**; uma versão inexistente (ex.: `3`) devolve `400`.
+
+O endpoint `GET /identities/{id}` tem duas versões:
+
+| Versão | Resposta |
+| :-- | :-- |
+| `1` (padrão) | A Identity, com o Sinner e as Tags como objetos (igual à Parte 1) |
+| `2` | A **ficha completa**: Identity + Stats + Sanity + Skills + Passivas em uma única chamada; `sinner` resumido e `tags` como lista de nomes |
+
+```bash
+curl http://localhost:8080/identities/1                        # v1
+curl http://localhost:8080/identities/1 -H "X-API-Version: 2"  # v2
+```
+
+Os demais endpoints não mudaram e atendem as duas versões. No Swagger UI, escolha a versão no seletor **Select a definition** (canto superior direito).
+
+### CORS
+
+O `LimbusCorsFilter` libera chamadas do navegador apenas para as origens listadas em `app.cors.allowed-origins` (padrão: `http://localhost:4200`, o front Angular), com os métodos `GET`, `POST`, `PUT`, `DELETE` e `OPTIONS`. Os headers `Location`, `Retry-After`, `X-Rate-Limit-*` e `Idempotent-Replayed` são expostos para o JavaScript do front.
+
+### Front-end (Angular)
+
+O front fica em um repositório separado, o [limbus-web](https://github.com/Kaicius/limbus-web). Suba esta API (`:8080`) e depois o front (`npm install` e `npm start`, em `http://localhost:4200`).
 
 ## API Reference
 
-São **43 endpoints**, em 7 grupos. A descrição completa de cada um (com exemplos de resposta de cada status) está no Swagger UI.
+São **47 endpoints** (contando as duas versões de `GET /identities/{id}`), em 7 grupos. A descrição completa de cada um (com exemplos de resposta de cada status) está no Swagger UI.
 
 ### Sinners
 
@@ -364,6 +438,7 @@ Consulta personalizada: Identities que possuem a Tag.
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
 | `id` | `integer` | **Required**. Id da Identity a buscar |
+| `X-API-Version` | `header` | `1` (padrão) devolve a Identity; `2` devolve a ficha completa (Stats, Sanity, Skills e Passivas) |
 
 **Status:** `200` OK · `400` Bad Request · `404` Not Found
 
@@ -449,6 +524,23 @@ Consulta personalizada por pecado.
 | `sort` | `string` | Ordenação no formato `campo,asc` ou `campo,desc`, ex.: `sort=nome,asc` |
 
 **Status:** `200` OK · `400` Bad Request
+
+#### Get skills of an identity
+
+```http
+  GET /identities/${identityId}/skills
+```
+
+Consulta personalizada: Skills de uma Identity.
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `identityId` | `integer` | **Required**. Id da Identity |
+| `page` | `integer` | Número da página, começando em 0 (padrão `0`) |
+| `size` | `integer` | Itens por página (padrão `10`) |
+| `sort` | `string` | Ordenação no formato `campo,asc` ou `campo,desc`, ex.: `sort=nome,asc` |
+
+**Status:** `200` OK · `400` Bad Request · `404` Not Found
 
 #### Get a specific skill
 
@@ -544,6 +636,23 @@ Consulta personalizada por tipo.
 | `sort` | `string` | Ordenação no formato `campo,asc` ou `campo,desc`, ex.: `sort=nome,asc` |
 
 **Status:** `200` OK · `400` Bad Request
+
+#### Get passives of an identity
+
+```http
+  GET /identities/${identityId}/passives
+```
+
+Consulta personalizada: Passivas de uma Identity.
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `identityId` | `integer` | **Required**. Id da Identity |
+| `page` | `integer` | Número da página, começando em 0 (padrão `0`) |
+| `size` | `integer` | Itens por página (padrão `10`) |
+| `sort` | `string` | Ordenação no formato `campo,asc` ou `campo,desc`, ex.: `sort=nome,asc` |
+
+**Status:** `200` OK · `400` Bad Request · `404` Not Found
 
 #### Get a specific passive
 
@@ -787,7 +896,7 @@ Esta API é um **projeto acadêmico e de fã (fan project)**, sem fins lucrativo
 
 - **Propriedade intelectual:** *Limbus Company*, seus personagens (Sinners), Identities, Skills, Passivas, nomes, imagens e demais elementos do jogo pertencem à **Project Moon**. Este projeto **não é afiliado, endossado ou patrocinado** pela Project Moon.
 - **Sem uso comercial:** a API existe apenas para fins de estudo e demonstração. Não deve ser usada para obter lucro nem para substituir os serviços oficiais do jogo.
-- **Dados:** os dados cadastrados são exemplos e podem estar incompletos ou incorretos. O banco é em memória (H2), então tudo é perdido ao reiniciar a aplicação.
+- **Dados:** os dados cadastrados são exemplos e podem estar incompletos ou incorretos. O banco é um MySQL local de desenvolvimento.
 - **Sem garantias:** o serviço é fornecido "como está", sem garantia de disponibilidade, precisão ou adequação a qualquer finalidade. O autor não se responsabiliza por danos decorrentes do uso.
 - **Remoção de conteúdo:** se a Project Moon ou qualquer detentor de direitos quiser a remoção de algum conteúdo, basta entrar em contato pelo e-mail abaixo.
 

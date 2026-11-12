@@ -30,6 +30,13 @@ public class PassiveService {
         return passiveRepository.findByTipo(tipo, pageable);
     }
 
+    public Page<Passive> buscarPorIdentity(Long identityId, Pageable pageable){
+        if (!identityRepository.existsById(identityId)) {
+            throw new ResourceNotFoundException("Identity", identityId);
+        }
+        return passiveRepository.findByIdentityId(identityId, pageable);
+    }
+
     public Passive buscarPorId(Long id){
         return passiveRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Passive", id));

@@ -30,6 +30,13 @@ public class SkillService {
         return skillRepository.findBySin(sin, pageable);
     }
 
+    public Page<Skill> buscarPorIdentity(Long identityId, Pageable pageable){
+        if (!identityRepository.existsById(identityId)) {
+            throw new ResourceNotFoundException("Identity", identityId);
+        }
+        return skillRepository.findByIdentityId(identityId, pageable);
+    }
+
     public Skill buscarPorId(Long id){
         return skillRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Skill", id));

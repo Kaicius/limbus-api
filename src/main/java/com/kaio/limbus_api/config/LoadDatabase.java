@@ -17,12 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-// Popula o banco H2 (que é em memória e começa vazio a cada execução) com dados iniciais.
-//  Para ligar: app.seed.enabled=true no application.properties.
-
-//  ATENÇÃO: os valores de Skills, Passivas, Stats e Sanity da Identity de exemplo são ILUSTRATIVOS.
-
 @Component
 @ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true", matchIfMissing = true)
 public class LoadDatabase implements CommandLineRunner {

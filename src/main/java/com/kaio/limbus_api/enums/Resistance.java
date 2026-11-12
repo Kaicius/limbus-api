@@ -1,6 +1,5 @@
 package com.kaio.limbus_api.enums;
 
-
 public enum Resistance {
     INEFFECTIVE(0.5),
     NORMAL(1.0),

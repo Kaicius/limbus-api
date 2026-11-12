@@ -19,8 +19,6 @@ import java.util.stream.Collectors;
 
 public class SwaggerCssInjector extends SwaggerIndexPageTransformer {
 
-    // O Swagger UI monta os textos dos links de contato sozinho ("<nome> - Website" e
-    // "Send email to <nome>"). Este script troca esses textos depois que a página renderiza.
     private static final String SCRIPT_CONTATO = "<script>"
             + "(function(){"
             + "function ajustar(){"
@@ -51,7 +49,6 @@ public class SwaggerCssInjector extends SwaggerIndexPageTransformer {
                  BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
                 String html = reader.lines().collect(Collectors.joining(System.lineSeparator()));
                 String transformado = html.replace("<title>Swagger UI</title>", "<title>Limbus API</title>")
-                        // remove os favicons padrão do Swagger e usa o logo da Limbus Company
                         .replaceAll("<link[^>]*rel=\"icon\"[^>]*>", "")
                         .replace("</head>",
                         "<link rel=\"icon\" type=\"image/png\" href=\"/limbus-logo.png\" />"

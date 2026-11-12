@@ -1,11 +1,27 @@
 package com.kaio.limbus_api.config;
 
+import com.kaio.limbus_api.filter.IdempotencyFilter;
+import com.kaio.limbus_api.filter.RateLimitFilter;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.examples.Example;
+import io.swagger.v3.oas.models.headers.Header;
+import io.swagger.v3.oas.models.media.BooleanSchema;
+import io.swagger.v3.oas.models.media.Content;
+import io.swagger.v3.oas.models.media.IntegerSchema;
+import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
+import io.swagger.v3.oas.models.parameters.HeaderParameter;
+import io.swagger.v3.oas.models.parameters.Parameter;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
 import org.springdoc.core.providers.ObjectMapperProvider;
@@ -13,10 +29,12 @@ import org.springdoc.webmvc.ui.SwaggerIndexTransformer;
 import org.springdoc.webmvc.ui.SwaggerWelcomeCommon;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.List;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Comparator;
 import java.util.List;
 
@@ -27,9 +45,11 @@ public class SwaggerConfig {
     public OpenAPI limbusOpenAPI() {
         return new OpenAPI().info(new Info()
                 .title("Limbus API")
-                .version("1.0.0")
+                .version("2.0.0")
                 .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
-                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.")
+                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.\n\n"
+                        + "**Recursos avançados:** todo POST exige o cabeçalho X-Idempotency-Key (idempotência); há limite de requisições por IP (token bucket, 429 com Retry-After); "
+                        + "a API é versionada pelo cabeçalho X-API-Version (escolha a versão no seletor \"Select a definition\", no topo); e o CORS libera apenas as origens configuradas.")
                 .termsOfService("https://github.com/Kaicius/limbus-api#termos-de-servi%C3%A7o")
                 .contact(new Contact()
                         .name("Kaio Alves")
@@ -53,7 +73,29 @@ public class SwaggerConfig {
             "Sinners", "Tags", "Identities", "Skills", "Passives", "Sanity", "Identity Stats");
 
     @Bean
-    public OpenApiCustomizer ordenarTags() {
+    public GroupedOpenApi apiV1() {
+        return grupoDaVersao("1");
+    }
+
+    @Bean
+    public GroupedOpenApi apiV2() {
+        return grupoDaVersao("2");
+    }
+
+    private GroupedOpenApi grupoDaVersao(String versao) {
+        return GroupedOpenApi.builder()
+                .group("v" + versao)
+                .displayName("Limbus API v" + versao)
+                .addOpenApiMethodFilter(metodo -> {
+                    RequestMapping mapeamento = AnnotatedElementUtils.findMergedAnnotation(metodo, RequestMapping.class);
+                    return mapeamento == null || mapeamento.version().isEmpty() || mapeamento.version().equals(versao);
+                })
+                .addOpenApiCustomizer(ordenarTags())
+                .addOpenApiCustomizer(documentarRecursosAvancados(versao))
+                .build();
+    }
+
+    private OpenApiCustomizer ordenarTags() {
         return openApi -> {
             if (openApi.getTags() == null) return;
             List<Tag> ordenadas = new ArrayList<>(openApi.getTags());
@@ -63,6 +105,136 @@ public class SwaggerConfig {
             }));
             openApi.setTags(ordenadas);
         };
+    }
+
+    private OpenApiCustomizer documentarRecursosAvancados(String versao) {
+        return openApi -> {
+            if (openApi.getPaths() == null) return;
+            openApi.getPaths().values().forEach(caminho -> {
+                caminho.readOperations().forEach(operacao -> {
+                    documentarVersao(operacao, versao);
+                    documentarRateLimit(operacao);
+                });
+                if (caminho.getPost() != null) {
+                    documentarIdempotencia(caminho.getPost());
+                }
+            });
+        };
+    }
+
+    private static void documentarVersao(Operation operacao, String versao) {
+        if (operacao.getParameters() == null) {
+            operacao.setParameters(new ArrayList<>());
+        }
+        Parameter cabecalho = operacao.getParameters().stream()
+                .filter(p -> ApiVersionConfig.HEADER.equals(p.getName()))
+                .findFirst().orElse(null);
+
+        boolean temVersoesDiferentes = cabecalho != null;
+        if (cabecalho == null) {
+            cabecalho = new HeaderParameter()
+                    .name(ApiVersionConfig.HEADER)
+                    .required(false)
+                    .description("Versão da API. Opcional: este endpoint responde igual nas versões 1 e 2. "
+                            + "Sem o cabeçalho vale a versão 1; uma versão inexistente (ex.: 3) devolve 400");
+            operacao.addParametersItem(cabecalho);
+        }
+        List<String> valores = temVersoesDiferentes ? List.of(versao) : List.of("1", "2");
+        cabecalho.setSchema(new StringSchema()._enum(new ArrayList<>(valores))._default(versao));
+    }
+
+    private static void documentarRateLimit(Operation operacao) {
+        ApiResponse limiteExcedido = adicionarResposta(operacao, "429",
+                "Too Many Requests – Limite de requisições por IP excedido (token bucket). O cabeçalho Retry-After diz quantos segundos esperar",
+                "Limite excedido",
+                exemploDeErro(429, "Too Many Requests", "Limite de 20 requisições a cada 60s excedido. Tente novamente em 3s"));
+        limiteExcedido.addHeaderObject("Retry-After", new Header()
+                .description("Segundos a esperar antes de tentar de novo")
+                .schema(new IntegerSchema().example(3)));
+
+        operacao.getResponses().values().forEach(resposta -> {
+            resposta.addHeaderObject(RateLimitFilter.HEADER_LIMITE, new Header()
+                    .description("Capacidade do balde: máximo de requisições por IP a cada 60 segundos")
+                    .schema(new IntegerSchema().example(20)));
+            resposta.addHeaderObject(RateLimitFilter.HEADER_RESTANTE, new Header()
+                    .description("Requisições (fichas) que este IP ainda pode fazer agora")
+                    .schema(new IntegerSchema().example(19)));
+        });
+    }
+
+    private static void documentarIdempotencia(Operation post) {
+        boolean jaDocumentado = post.getParameters().stream()
+                .anyMatch(p -> IdempotencyFilter.HEADER.equals(p.getName()));
+        if (!jaDocumentado) {
+            post.addParametersItem(new HeaderParameter()
+                    .name(IdempotencyFilter.HEADER)
+                    .required(true)
+                    .description("Chave única da operação (ex.: um UUID). Repetir a mesma chave com o mesmo corpo devolve a resposta original "
+                            + "(com Idempotent-Replayed: true) em vez de criar outro registro")
+                    .schema(new StringSchema().maxLength(255))
+                    .example("3f2b8c1e-9d4a-4c7e-b1a2-6e5f0d9c8a71"));
+        }
+
+        adicionarResposta(post, "400",
+                "Bad Request – Cabeçalho X-Idempotency-Key ausente, em branco ou com mais de 255 caracteres",
+                "Sem X-Idempotency-Key",
+                exemploDeErro(400, "Bad Request",
+                        "Cabeçalho obrigatório ausente: X-Idempotency-Key (envie uma chave única por operação, ex.: um UUID)"));
+        adicionarResposta(post, "409",
+                "Conflict – Uma requisição com a mesma X-Idempotency-Key ainda está sendo processada",
+                "Chave em processamento",
+                exemploDeErro(409, "Conflict", "Uma requisição com esta X-Idempotency-Key ainda está sendo processada"));
+        adicionarResposta(post, "422",
+                "Unprocessable Content – A X-Idempotency-Key já foi usada com um corpo de requisição diferente",
+                "Chave reutilizada",
+                exemploDeErro(422, "Unprocessable Content", "X-Idempotency-Key já foi usada com um corpo de requisição diferente"));
+
+        ApiResponse criado = post.getResponses().get("201");
+        if (criado != null) {
+            criado.addHeaderObject("Location", new Header()
+                    .description("URL do recurso criado")
+                    .schema(new StringSchema().example("http://localhost:8080/sinners/1")));
+            criado.addHeaderObject(IdempotencyFilter.HEADER_REPLAY, new Header()
+                    .description("Vem como true quando a resposta é a repetição de uma requisição anterior com a mesma X-Idempotency-Key "
+                            + "(nada novo foi criado). Ausente na primeira vez")
+                    .schema(new BooleanSchema().example(true)));
+        }
+    }
+
+    private static ApiResponse adicionarResposta(Operation operacao, String status, String descricao,
+                                                 String nomeDoExemplo, Map<String, Object> exemplo) {
+        if (operacao.getResponses() == null) {
+            operacao.setResponses(new ApiResponses());
+        }
+        ApiResponse resposta = operacao.getResponses().get(status);
+        if (resposta == null) {
+            resposta = new ApiResponse().description(descricao);
+            operacao.getResponses().addApiResponse(status, resposta);
+        } else if (resposta.getDescription() == null) {
+            resposta.setDescription(descricao);
+        } else if (!resposta.getDescription().contains(descricao)) {
+            resposta.setDescription(resposta.getDescription() + ". Também: " + descricao);
+        }
+
+        if (resposta.getContent() == null) {
+            resposta.setContent(new Content());
+        }
+        MediaType json = resposta.getContent().get("application/json");
+        if (json == null) {
+            json = new MediaType().schema(new Schema<Object>().$ref("#/components/schemas/ErrorResponse"));
+            resposta.getContent().addMediaType("application/json", json);
+        }
+        json.addExamples(nomeDoExemplo, new Example().value(exemplo));
+        return resposta;
+    }
+
+    private static Map<String, Object> exemploDeErro(int status, String erro, String mensagem) {
+        Map<String, Object> exemplo = new LinkedHashMap<>();
+        exemplo.put("status", status);
+        exemplo.put("erro", erro);
+        exemplo.put("mensagem", mensagem);
+        exemplo.put("timestamp", "2026-10-08T00:54:40");
+        return exemplo;
     }
 
     @Bean

@@ -1,5 +1,6 @@
 package com.kaio.limbus_api.controller;
 
+import com.kaio.limbus_api.config.ApiVersionConfig;
 import com.kaio.limbus_api.dto.ErrorExamples;
 import com.kaio.limbus_api.dto.ErrorResponse;
 import com.kaio.limbus_api.dto.IdentityRequest;
@@ -7,6 +8,7 @@ import com.kaio.limbus_api.entity.Identity;
 import com.kaio.limbus_api.service.IdentityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,10 +23,8 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,14 +63,18 @@ public class IdentityController {
 
     @Operation(
             summary = "Lista as Identities de um Sinner (paginado)",
-            description = "Consulta personalizada: retorna as Identities que pertencem ao Sinner informado. Se o Sinner não existir ou não tiver Identities, a página vem vazia."
+            description = "Consulta personalizada: retorna as Identities que pertencem ao Sinner informado. Se o Sinner não tiver Identities, a página vem vazia."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK – Página com as Identities do Sinner (vazia se não houver)"),
-            @ApiResponse(responseCode = "400", description = "Bad Request – Id do Sinner inválido (não numérico)",
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id do Sinner inválido (não numérico) ou campo de ordenação (sort) inexistente",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class),
-                            examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID)))
+                            examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhum Sinner com o id informado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_SINNER)))
     })
     @GetMapping("/sinners/{sinnerId}/identities")
     public ResponseEntity<PagedModel<EntityModel<Identity>>> buscarPorSinner(
@@ -100,8 +104,9 @@ public class IdentityController {
     }
 
     @Operation(
-            summary = "Busca uma Identity pelo id",
-            description = "Retorna uma única Identity, com o Sinner dono e a lista de Tags."
+            summary = "Busca uma Identity pelo id (v1)",
+            description = "Versão 1 (padrão quando o cabeçalho X-API-Version não é enviado): retorna uma única Identity, com o Sinner dono e a lista de Tags. "
+                    + "A versão 2 (X-API-Version: 2) devolve a ficha completa, com Stats, Sanity, Skills e Passivas."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK – Identity encontrada"),
@@ -114,7 +119,10 @@ public class IdentityController {
                             schema = @Schema(implementation = ErrorResponse.class),
                             examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY)))
     })
-    @GetMapping("/identities/{id}")
+    @Parameter(in = ParameterIn.HEADER, name = ApiVersionConfig.HEADER, required = false,
+            description = "Versão da API. Este documento descreve a versão 1 (a padrão quando o cabeçalho não é enviado)",
+            schema = @Schema(type = "string", defaultValue = "1"))
+    @GetMapping(path = "/identities/{id}", version = "1")
     public ResponseEntity<EntityModel<Identity>> buscarPorId(
             @Parameter(description = "Id da Identity", example = "1")
             @PathVariable Long id) {
