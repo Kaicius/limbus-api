@@ -155,3 +155,6 @@ html, body {
 .swagger-ui .responses-inner { background: transparent !important; }
 .swagger-ui .opblock-body { background: transparent !important; }
 .swagger-ui .tab li.active, .swagger-ui .tab li button.tablinks.active { color: var(--lc-yellow) !important; }
+.swagger-ui .info .title small:not(.version-stamp) pre.version { font-size: 0 !important; }
+.swagger-ui .info .title small:not(.version-stamp) pre.version::after { content: "1.0.0"; font-size: 12px; }
+body:has(#select option[value$="/v2"]:checked) .swagger-ui .info .title small:not(.version-stamp) pre.version::after { content: "2.0.0"; }
