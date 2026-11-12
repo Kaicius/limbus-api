@@ -22,10 +22,8 @@ import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -79,6 +77,29 @@ public class PassiveController {
             @RequestParam PassivaType tipo,
             @ParameterObject @PageableDefault(size = 10, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(pagedAssembler.toModel(service.buscarPorTipo(tipo, pageable), assembler));
+    }
+
+    @Operation(
+            summary = "Lista as Passivas de uma Identity (paginado)",
+            description = "Consulta personalizada: retorna as Passivas que pertencem à Identity informada na URL."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "OK – Página com as Passivas da Identity (vazia se ela não tiver nenhuma)"),
+            @ApiResponse(responseCode = "400", description = "Bad Request – Id inválido (não numérico) ou campo de ordenação (sort) inexistente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "Id inválido", value = ErrorExamples.BAD_REQUEST_ID))),
+            @ApiResponse(responseCode = "404", description = "Not Found – Nenhuma Identity com o id informado",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ErrorResponse.class),
+                            examples = @ExampleObject(name = "Não encontrado", value = ErrorExamples.NOT_FOUND_IDENTITY)))
+    })
+    @GetMapping("/identities/{identityId}/passives")
+    public ResponseEntity<PagedModel<EntityModel<Passive>>> buscarPorIdentity(
+            @Parameter(description = "Id da Identity", example = "1")
+            @PathVariable Long identityId,
+            @ParameterObject @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        return ResponseEntity.ok(pagedAssembler.toModel(service.buscarPorIdentity(identityId, pageable), assembler));
     }
 
     @Operation(

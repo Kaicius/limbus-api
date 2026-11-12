@@ -26,7 +26,6 @@ html, body {
   font-family: 'Noto Sans', system-ui, sans-serif !important;
 }
 
-/*  Barra superior  */
 .swagger-ui .topbar { background: #000 !important; border-bottom: 3px solid var(--lc-yellow) !important; padding: 10px 0 !important; }
 .swagger-ui .topbar .download-url-wrapper .select-label span,
 .swagger-ui .topbar a span { color: var(--lc-yellow) !important; }
@@ -44,7 +43,6 @@ html, body {
 .swagger-ui .topbar .download-url-wrapper input[type=text] { border: 2px solid var(--lc-yellow) !important; }
 .swagger-ui .topbar .download-url-wrapper .download-url-button { background: var(--lc-yellow) !important; color: #000 !important; font-weight: 700; }
 
-/*  Cabeçalho da API  */
 .swagger-ui .info { margin: 36px 0 24px !important; }
 .swagger-ui .info .title {
   color: var(--lc-yellow) !important; font-family: 'Oswald', sans-serif !important;
@@ -59,7 +57,6 @@ html, body {
 .swagger-ui .scheme-container { background: var(--lc-panel) !important; box-shadow: none !important; border-top: 1px solid var(--lc-line); border-bottom: 1px solid var(--lc-line); }
 .swagger-ui .servers > label select { background: var(--lc-panel-2) !important; color: var(--lc-text) !important; border: 1px solid var(--lc-yellow) !important; }
 
-/*  Tags  */
 .swagger-ui .opblock-tag {
   color: var(--lc-yellow) !important; font-family: 'Oswald', sans-serif !important;
   font-size: 24px !important; letter-spacing: 2px; text-transform: uppercase;
@@ -69,7 +66,6 @@ html, body {
 .swagger-ui .opblock-tag:hover { background: rgba(245,197,24,.06) !important; }
 .swagger-ui .opblock-tag svg, .swagger-ui .expand-operation svg, .swagger-ui .model-toggle::after { fill: var(--lc-yellow) !important; }
 
-/*  Operações  */
 .swagger-ui .opblock {
   background: var(--lc-panel) !important; border: 1px solid var(--lc-line) !important;
   border-left-width: 6px !important; border-radius: 0 !important; box-shadow: none !important; margin: 0 0 12px !important;
@@ -98,7 +94,6 @@ html, body {
 }
 .swagger-ui .opblock-description-wrapper, .swagger-ui .opblock-external-docs-wrapper, .swagger-ui .opblock-title_normal { color: var(--lc-text) !important; }
 
-/*  Tabelas e parâmetros  */
 .swagger-ui table thead tr td, .swagger-ui table thead tr th, .swagger-ui .parameters-col_description,
 .swagger-ui .tab li, .swagger-ui .response-col_status, .swagger-ui .response-col_links { color: var(--lc-yellow) !important; border-bottom: 1px solid var(--lc-line) !important; }
 .swagger-ui .parameter__name.required::after { color: var(--lc-red) !important; }
@@ -106,14 +101,12 @@ html, body {
 .swagger-ui .parameter__type, .swagger-ui .parameter__in, .swagger-ui .prop-format { color: var(--lc-muted) !important; }
 .swagger-ui table tbody tr td { border-bottom: 1px solid #262626 !important; }
 
-/*  Campos de entrada  */
 .swagger-ui input[type=text], .swagger-ui input[type=password], .swagger-ui input[type=search],
 .swagger-ui input[type=email], .swagger-ui input[type=file], .swagger-ui textarea, .swagger-ui select {
   background: #0f0f0f !important; color: var(--lc-text) !important; border: 1px solid #555 !important; border-radius: 0 !important;
 }
 .swagger-ui input:focus, .swagger-ui textarea:focus, .swagger-ui select:focus { outline: 2px solid var(--lc-yellow) !important; border-color: var(--lc-yellow) !important; }
 
-/*  Botões  */
 .swagger-ui .btn { border-radius: 0 !important; font-family: 'Oswald', sans-serif !important; letter-spacing: 1px; text-transform: uppercase; box-shadow: none !important; }
 .swagger-ui .btn.execute { background: var(--lc-red) !important; border-color: var(--lc-red) !important; color: #fff !important; clip-path: var(--lc-cut); }
 .swagger-ui .btn.execute:hover { background: var(--lc-yellow) !important; border-color: var(--lc-yellow) !important; color: #000 !important; }
@@ -124,7 +117,6 @@ html, body {
 .swagger-ui .try-out__btn { background: transparent !important; color: var(--lc-yellow) !important; border: 2px solid var(--lc-yellow) !important; }
 .swagger-ui .btn-group .btn { color: var(--lc-text) !important; }
 
-/*  Respostas e código  */
 .swagger-ui .responses-table { background: transparent !important; }
 .swagger-ui .response-col_status { font-family: 'Oswald', sans-serif !important; font-size: 18px; }
 .swagger-ui .highlight-code > .microlight, .swagger-ui .microlight, .swagger-ui pre.example, .swagger-ui .opblock-body pre.microlight {
@@ -134,7 +126,6 @@ html, body {
 .swagger-ui .copy-to-clipboard { background: var(--lc-yellow) !important; }
 .swagger-ui .live-responses-table .response-col_status { color: var(--lc-yellow) !important; }
 
-/*  Schemas */
 .swagger-ui section.models { background: var(--lc-panel) !important; border: 1px solid var(--lc-line) !important; border-radius: 0 !important; }
 .swagger-ui section.models h4 { color: var(--lc-yellow) !important; font-family: 'Oswald', sans-serif !important; letter-spacing: 2px; text-transform: uppercase; }
 .swagger-ui section.models .model-container { background: var(--lc-panel-2) !important; border-radius: 0 !important; margin: 8px 0 !important; }
@@ -143,7 +134,6 @@ html, body {
 .swagger-ui .model-toggle::after { filter: none; }
 .swagger-ui .models-control svg { fill: var(--lc-yellow) !important; }
 
-/*  Detalhes  */
 .swagger-ui .opblock-body .opblock-description-wrapper p code, .swagger-ui .markdown code { background: #050505 !important; color: var(--lc-yellow) !important; }
 .swagger-ui .loading-container .loading::after { color: var(--lc-yellow) !important; }
 .swagger-ui .dialog-ux .modal-ux { background: var(--lc-panel) !important; border: 2px solid var(--lc-yellow) !important; border-radius: 0 !important; }
@@ -154,7 +144,6 @@ html, body {
 ::-webkit-scrollbar-track { background: #000; }
 ::-webkit-scrollbar-thumb { background: var(--lc-red-dk); border: 1px solid #000; }
 
-/*  Texto geral */
 .swagger-ui h1, .swagger-ui h2, .swagger-ui h3, .swagger-ui h4, .swagger-ui h5,
 .swagger-ui .model-title, .swagger-ui .prop-name, .swagger-ui .tab li button.tablinks,
 .swagger-ui .responses-inner .response-col_description__inner, .swagger-ui .opblock-summary-description {

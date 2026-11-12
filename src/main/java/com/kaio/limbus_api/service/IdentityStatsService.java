@@ -25,7 +25,6 @@ public class IdentityStatsService {
         return identityStatsRepository.findAll(pageable);
     }
 
-
     public IdentityStats buscarPorId(Long id) {
         return identityStatsRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("IdentityStats", id));

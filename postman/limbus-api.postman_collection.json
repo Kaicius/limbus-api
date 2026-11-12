@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "3ff2fefe-8a4f-4485-b9e2-b1469ffc9d80",
     "name": "limbus-api",
-    "description": "Coleção da Limbus API (Spring Boot). Rode com a aplicação em localhost:8080. Ordem sugerida: pastas 1 a 8, de cima para baixo. As requisições \"ERRO\" mostram 400, 404 e 409.",
+    "description": "Coleção da Limbus API (Spring Boot). Rode com a aplicação em localhost:8080. Ordem sugerida: pastas 1 a 9, de cima para baixo. As requisições \"ERRO\" mostram 400, 404 e 409. Parte 2: todo POST envia X-Idempotency-Key ({{$guid}}); a pasta 8 demonstra idempotência, versionamento, rate limit e CORS.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -108,6 +108,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -277,6 +282,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -318,6 +328,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -444,6 +459,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -611,6 +631,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -778,6 +803,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -892,6 +922,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -935,6 +970,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1064,6 +1104,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1326,6 +1371,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1510,6 +1560,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1653,6 +1708,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1767,6 +1827,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -1909,6 +1974,11 @@
               {
                 "key": "Content-Type",
                 "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Obrigatório em todo POST. {{$guid}} gera um UUID novo a cada envio."
               }
             ],
             "url": {
@@ -2006,7 +2076,440 @@
       ]
     },
     {
-      "name": "8. Limpeza",
+      "name": "8. Recursos avançados (Parte 2)",
+      "description": "Idempotência (X-Idempotency-Key), versionamento (X-API-Version), rate limit (token bucket) e CORS. Rode de cima para baixo, depois das pastas 1 a 7 (usa a variável identityId).",
+      "item": [
+        {
+          "name": "Idempotência 1 - POST com chave nova (cria)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('idemKey', pm.variables.replaceIn('{{$guid}}'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.expect(pm.response.code === 201).to.be.true; });",
+                  "pm.test('Não é replay', function () { pm.expect(pm.response.headers.get('Idempotent-Replayed')).to.not.eql('true'); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('idemSinnerId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{idemKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sinner Idempotente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Gera uma chave nova (variável idemKey) e cria o Sinner. Guarda o id em idemSinnerId."
+          }
+        },
+        {
+          "name": "Idempotência 2 - mesma chave e mesmo corpo (replay)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.expect(pm.response.code === 201).to.be.true; });",
+                  "pm.test('Idempotent-Replayed: true', function () { pm.expect(pm.response.headers.get('Idempotent-Replayed')).to.eql('true'); });",
+                  "pm.test('Mesmo id da 1ª resposta (nada foi criado de novo)', function () { pm.expect(String(pm.response.json().id)).to.eql(String(pm.collectionVariables.get('idemSinnerId'))); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{idemKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sinner Idempotente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Repete a requisição anterior. O controller não roda: a API devolve a resposta guardada, com Idempotent-Replayed: true."
+          }
+        },
+        {
+          "name": "Idempotência 3 - ERRO mesma chave, corpo diferente (422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 422', function () { pm.expect(pm.response.code === 422).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{idemKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Outro Nome\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "A chave já foi usada com outro corpo: 422 Unprocessable Content."
+          }
+        },
+        {
+          "name": "Idempotência 4 - ERRO POST sem a chave (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.expect(pm.response.code === 400).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Sinner Idempotente\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "X-Idempotency-Key é obrigatório em todo POST."
+          }
+        },
+        {
+          "name": "Idempotência 5 - limpa o Sinner criado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.expect(pm.response.code === 204).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sinners/{{idemSinnerId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners",
+                "{{idemSinnerId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Versão 1 - GET identity (padrão, sem cabeçalho)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('v1: tags são objetos e não há skills', function () { const j = pm.response.json(); pm.expect(j.tags[0]).to.be.an('object'); pm.expect(j.skills).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/identities/{{identityId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "identities",
+                "{{identityId}}"
+              ]
+            },
+            "description": "Sem X-API-Version a API responde com a versão 1."
+          }
+        },
+        {
+          "name": "Versão 2 - GET identity (ficha completa)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('v2: traz skills, passives e tags como texto', function () { const j = pm.response.json(); pm.expect(j.skills).to.be.an('array'); pm.expect(j.passives).to.be.an('array'); pm.expect(j.tags[0]).to.be.a('string'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/identities/{{identityId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "identities",
+                "{{identityId}}"
+              ]
+            },
+            "description": "Mesma URL, outro formato: Identity + Stats + Sanity + Skills + Passivas em uma chamada."
+          }
+        },
+        {
+          "name": "Versão 3 - ERRO versão inexistente (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.expect(pm.response.code === 400).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Version",
+                "value": "3"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/identities/{{identityId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "identities",
+                "{{identityId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Rate limit - cabeçalhos de uso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('Informa limite e restante', function () { pm.expect(pm.response.headers.has('X-Rate-Limit-Limit')).to.be.true; pm.expect(pm.response.headers.has('X-Rate-Limit-Remaining')).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "description": "Toda resposta informa X-Rate-Limit-Limit e X-Rate-Limit-Remaining. Para ver o 429 (com Retry-After), baixe app.rate-limit.capacity para 5 no application.properties, reinicie e envie esta requisição várias vezes seguidas."
+          }
+        },
+        {
+          "name": "CORS - preflight de origem permitida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('Origem liberada', function () { pm.expect(pm.response.headers.get('Access-Control-Allow-Origin')).to.eql('http://localhost:4200'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:4200"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "content-type,x-idempotency-key"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "description": "Simula o preflight que o navegador faz antes de um POST vindo do front (http://localhost:4200)."
+          }
+        },
+        {
+          "name": "CORS - ERRO preflight de origem não permitida (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', function () { pm.expect(pm.response.code === 403).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://site-qualquer.com"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sinners",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sinners"
+              ]
+            },
+            "description": "Origem fora de app.cors.allowed-origins: o preflight é recusado."
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Limpeza",
       "item": [
         {
           "name": "Delete the created identity",
@@ -2071,6 +2574,14 @@
     },
     {
       "key": "statsId",
+      "value": ""
+    },
+    {
+      "key": "idemKey",
+      "value": ""
+    },
+    {
+      "key": "idemSinnerId",
       "value": ""
     }
   ]

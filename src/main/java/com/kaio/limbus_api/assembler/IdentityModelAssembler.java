@@ -13,10 +13,6 @@ import org.springframework.stereotype.Component;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
-/**
- * Transforma Identity em EntityModel, acrescentando os links HATEOAS:
- * self, update, delete, a coleção e os recursos relacionados.
- */
 @Component
 public class IdentityModelAssembler implements RepresentationModelAssembler<Identity, EntityModel<Identity>> {
 

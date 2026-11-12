@@ -14,6 +14,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -72,6 +73,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> rotaInexistente(NoResourceFoundException ex) {
         return montar(HttpStatus.NOT_FOUND, "Rota inexistente: /" + ex.getResourcePath());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> erroComStatus(ResponseStatusException ex) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String mensagem = ex.getReason() != null ? ex.getReason() : status.getReasonPhrase();
+        if (status == HttpStatus.BAD_REQUEST && mensagem.toLowerCase().contains("version")) {
+            mensagem = "Versão da API inexistente. Envie X-API-Version: 1 ou 2 (" + mensagem + ")";
+        }
+        return montar(status, mensagem);
     }
 
     private ResponseEntity<ErrorResponse> montar(HttpStatus status, String mensagem) {
