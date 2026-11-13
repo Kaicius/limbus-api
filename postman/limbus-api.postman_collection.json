@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "3ff2fefe-8a4f-4485-b9e2-b1469ffc9d80",
     "name": "limbus-api",
-    "description": "Coleção da Limbus API (Spring Boot). Rode com a aplicação em localhost:8080. Ordem sugerida: pastas 1 a 9, de cima para baixo. As requisições \"ERRO\" mostram 400, 404 e 409. Parte 2: todo POST envia X-Idempotency-Key ({{$guid}}); a pasta 8 demonstra idempotência, versionamento, rate limit e CORS.",
+    "description": "Coleção da Limbus API (Spring Boot). Rode com a aplicação em localhost:8080. Ordem sugerida: pastas 1 a 9, de cima para baixo. As requisições \"ERRO\" mostram 400, 404 e 409. Parte 2: todo POST envia X-Idempotency-Key ({{$guid}}); a pasta 8 demonstra idempotência, versionamento, rate limit e CORS. Todas as requisições enviam X-API-Key com a variável apiKey (por padrão, a chave de administrador de desenvolvimento).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -2077,8 +2077,545 @@
     },
     {
       "name": "8. Recursos avançados (Parte 2)",
-      "description": "Idempotência (X-Idempotency-Key), versionamento (X-API-Version), rate limit (token bucket) e CORS. Rode de cima para baixo, depois das pastas 1 a 7 (usa a variável identityId).",
+      "description": "Autenticação por chave de API (X-API-Key), idempotência (X-Idempotency-Key), versionamento (X-API-Version), rate limit (token bucket) e CORS. Rode de cima para baixo, depois das pastas 1 a 7 (usa a variável identityId).",
       "item": [
+        {
+          "name": "Chave de API 1 - ERRO escrita sem chave (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', function () { pm.expect(pm.response.code === 401).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tag da Chave de Usuario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "POST, PUT e DELETE exigem o cabeçalho X-API-Key. Esta requisição não envia a chave."
+          }
+        },
+        {
+          "name": "Chave de API 2 - ERRO chave inválida (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', function () { pm.expect(pm.response.code === 401).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "chave-que-nao-existe"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tag da Chave de Usuario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Chave de API 3 - Gerar minha chave (rota aberta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.expect(pm.response.code === 201).to.be.true; });",
+                  "pm.test('Devolve a chave completa', function () { pm.expect(pm.response.json().chave).to.match(/^lmb_/); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('userKey', pm.response.json().chave); pm.collectionVariables.set('userKeyId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuario do Postman\",\n  \"email\": \"postman@exemplo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Qualquer pessoa gera uma chave informando nome e e-mail, sem enviar X-API-Key. O valor só aparece nesta resposta; fica guardado na variável userKey."
+          }
+        },
+        {
+          "name": "Chave de API 4 - ERRO cadastro com e-mail inválido (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 400', function () { pm.expect(pm.response.code === 400).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuario do Postman\",\n  \"email\": \"nao-e-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Chave de API 5 - Consultar a minha chave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('Mostra o dono, sem o valor da chave', function () { const j = pm.response.json(); pm.expect(j.email).to.eql('postman@exemplo.com'); pm.expect(j.chave).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Chave de API 6 - Escrita com a minha chave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', function () { pm.expect(pm.response.code === 201).to.be.true; });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('keyTagId', pm.response.json().id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tag da Chave de Usuario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Qualquer chave ativa pode criar, editar e excluir recursos."
+          }
+        },
+        {
+          "name": "Chave de API 7 - Limpa a Tag criada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.expect(pm.response.code === 204).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tags/{{keyTagId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags",
+                "{{keyTagId}}"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Chave de API 8 - ERRO chave de usuário listando todas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', function () { pm.expect(pm.response.code === 403).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "A chave é válida, mas só a de administrador vê e gerencia as chaves dos outros."
+          }
+        },
+        {
+          "name": "Chave de API 9 - Listar todas as chaves (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () { pm.expect(pm.response.code === 200).to.be.true; });",
+                  "pm.test('Não expõe o valor das chaves', function () { pm.expect(pm.response.json()[0].chave).to.be.undefined; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys"
+              ]
+            },
+            "description": "Usa a chave de administrador (variável apiKey)."
+          }
+        },
+        {
+          "name": "Chave de API 10 - ERRO admin em /api-keys/me (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 403', function () { pm.expect(pm.response.code === 403).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys",
+                "me"
+              ]
+            },
+            "description": "A chave de administrador não tem cadastro próprio."
+          }
+        },
+        {
+          "name": "Chave de API 11 - Revogar a minha chave",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.expect(pm.response.code === 204).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Chave de API 12 - ERRO chave revogada (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 401', function () { pm.expect(pm.response.code === 401).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-API-Key",
+                "value": "{{userKey}}"
+              },
+              {
+                "key": "X-Idempotency-Key",
+                "value": "{{$guid}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tags"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Tag da Chave de Usuario\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Chave de API 13 - Excluir a chave revogada (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 204', function () { pm.expect(pm.response.code === 204).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api-keys/{{userKeyId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api-keys",
+                "{{userKeyId}}"
+              ]
+            }
+          }
+        },
         {
           "name": "Idempotência 1 - POST com chave nova (cria)",
           "event": [
@@ -2231,7 +2768,7 @@
           }
         },
         {
-          "name": "Idempotência 4 - ERRO POST sem a chave (400)",
+          "name": "Idempotência 4 - ERRO POST sem X-Idempotency-Key (400)",
           "event": [
             {
               "listen": "test",
@@ -2583,6 +3120,42 @@
     {
       "key": "idemSinnerId",
       "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": "limbus-admin"
+    },
+    {
+      "key": "userKey",
+      "value": ""
+    },
+    {
+      "key": "userKeyId",
+      "value": ""
+    },
+    {
+      "key": "keyTagId",
+      "value": ""
     }
-  ]
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-API-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  }
 }

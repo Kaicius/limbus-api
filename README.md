@@ -45,7 +45,7 @@ A API sobe em `http://localhost:8080`.
 
 ### Coleção do Postman
 
-A coleção está em [`postman/limbus-api.postman_collection.json`](postman/limbus-api.postman_collection.json): **65 requisições** (os endpoints da Parte 1, seus casos de erro `400`, `404` e `409`, e a pasta 8 com os recursos da Parte 2), agrupadas por recurso. Todo `POST` já envia `X-Idempotency-Key: {{$guid}}`.
+A coleção está em [`postman/limbus-api.postman_collection.json`](postman/limbus-api.postman_collection.json): **78 requisições** (os endpoints da Parte 1, seus casos de erro `400`, `404` e `409`, e a pasta 8 com os recursos da Parte 2), agrupadas por recurso. Todo `POST` já envia `X-Idempotency-Key: {{$guid}}`, e todas as requisições enviam `X-API-Key` com a variável `apiKey` (por padrão, a chave de administrador de desenvolvimento).
 
 [`Link Site`](https://www.postman.com/kaioalvesesousa-7274103/limbus-api/collection/uorbhg5/limbus-api?action=share&creator=52699429)
 
@@ -130,6 +130,8 @@ Todo erro tem o mesmo corpo:
 | `201 Created` | Recurso criado (header `Location` aponta para ele) |
 | `204 No Content` | Remoção bem-sucedida |
 | `400 Bad Request` | Validação falhou, JSON malformado, id ou enum inválido, parâmetro ausente |
+| `401 Unauthorized` | `X-API-Key` ausente, inválida ou revogada em uma rota protegida |
+| `403 Forbidden` | Chave válida, mas sem permissão (só a de administrador gerencia as chaves dos outros) |
 | `404 Not Found` | Recurso (ou Sinner/Identity/Tag referenciado) não existe |
 | `409 Conflict` | Valor único duplicado, recurso ainda em uso ou `X-Idempotency-Key` ainda em processamento |
 | `422 Unprocessable Content` | `X-Idempotency-Key` reutilizada com um corpo diferente |
@@ -137,7 +139,39 @@ Todo erro tem o mesmo corpo:
 
 ## Recursos avançados (Parte 2)
 
-Os três primeiros são **filtros** (`filter/`), que rodam antes dos controllers, nesta ordem: CORS → rate limit → idempotência.
+Quatro deles são **filtros** (`filter/`), que rodam antes dos controllers, nesta ordem: CORS → rate limit → chave de API → idempotência.
+
+### Autenticação com chave de API (`X-API-Key`)
+
+As leituras (`GET`) são livres. Os endpoints sensíveis, ou seja, tudo que altera dados (`POST`, `PUT` e `DELETE`), exigem uma chave de API válida no cabeçalho `X-API-Key`.
+
+**Gerar uma chave** é aberto a qualquer pessoa: basta informar nome e e-mail (um cadastro simples).
+
+```bash
+curl -X POST http://localhost:8080/api-keys \
+  -H "Content-Type: application/json" \
+  -H "X-Idempotency-Key: 5d0c9a52-6f6f-4f0e-9d59-3f1f0f6b7a10" \
+  -d '{"nome": "Kaio Alves", "email": "kaio@exemplo.com"}'
+# resposta: { "id": 1, "nome": "Kaio Alves", "email": "kaio@exemplo.com", "chave": "lmb_...", ... }
+```
+
+O valor da chave aparece **somente nessa resposta**: o banco guarda apenas o hash SHA-256 e um prefixo para identificá-la.
+
+| Quem | O que pode fazer |
+| :-- | :-- |
+| Qualquer pessoa | Ler (`GET`) e gerar uma chave (`POST /api-keys`) |
+| Dono de uma chave | Criar, editar e excluir recursos; consultar (`GET /api-keys/me`) e revogar (`DELETE /api-keys/me`) a própria chave |
+| Administrador | Tudo acima, mais listar, revogar e excluir as chaves de todos (`/api-keys` e `/api-keys/{id}`) |
+
+| Situação | Resposta |
+| :-- | :-- |
+| Rota protegida sem `X-API-Key` | `401 Unauthorized` |
+| Chave inexistente ou revogada | `401 Unauthorized` |
+| Chave de usuário nas rotas de administração | `403 Forbidden` |
+
+A chave de administrador vem da variável de ambiente `ADMIN_API_KEY` (padrão de desenvolvimento: `limbus-admin`). Ela serve para moderar: revogar a chave de quem abusar, por exemplo.
+
+No Swagger UI, clique em **Authorize** e informe a chave para testar as rotas protegidas.
 
 ### Idempotência (`X-Idempotency-Key`)
 
@@ -193,7 +227,7 @@ Os demais endpoints não mudaram e atendem as duas versões. No Swagger UI, esco
 
 ### CORS
 
-O `LimbusCorsFilter` libera chamadas do navegador apenas para as origens listadas em `app.cors.allowed-origins` (padrão: `http://localhost:4200`, o front Angular), com os métodos `GET`, `POST`, `PUT`, `DELETE` e `OPTIONS`. Os headers `Location`, `Retry-After`, `X-Rate-Limit-*` e `Idempotent-Replayed` são expostos para o JavaScript do front.
+O `LimbusCorsFilter` libera chamadas do navegador apenas para as origens listadas em `app.cors.allowed-origins` (padrão: `http://localhost:4200`, o front Angular), com os métodos `GET`, `POST`, `PUT`, `DELETE` e `OPTIONS`. O front pode enviar os headers `X-API-Key`, `X-Idempotency-Key` e `X-API-Version`. Os headers `Location`, `Retry-After`, `X-Rate-Limit-*` e `Idempotent-Replayed` são expostos para o JavaScript do front.
 
 ### Front-end (Angular)
 
@@ -201,7 +235,7 @@ O front fica em um repositório separado, o [limbus-web](https://github.com/Kaic
 
 ## API Reference
 
-São **47 endpoints** (contando as duas versões de `GET /identities/{id}`), em 7 grupos. A descrição completa de cada um (com exemplos de resposta de cada status) está no Swagger UI.
+São **54 endpoints** (contando as duas versões de `GET /identities/{id}`), em 8 grupos. A descrição completa de cada um (com exemplos de resposta de cada status) está no Swagger UI.
 
 ### Sinners
 
@@ -891,6 +925,89 @@ Uma Identity só pode ter um registro de Stats (409 se já existir).
 | `id` | `integer` | **Required**. Id dos Stats a remover |
 
 **Status:** `204` No Content · `400` Bad Request · `404` Not Found
+
+### API Keys
+
+#### Generate an API key
+
+```http
+  POST /api-keys
+```
+
+Rota aberta (não exige `X-API-Key`).
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `nome` | `string` | **Required**. Dono da chave (2 a 100 caracteres) |
+| `email` | `string` | **Required**. E-mail de contato (até 150 caracteres) |
+
+A resposta traz o campo `chave` com o valor completo, exibido somente nesse momento.
+
+**Status:** `201` Created · `400` Bad Request
+
+#### Get my API key
+
+```http
+  GET /api-keys/me
+```
+
+Dados da chave enviada em `X-API-Key` (sem o valor dela).
+
+**Status:** `200` OK · `401` Unauthorized · `403` Forbidden
+
+#### Revoke my API key
+
+```http
+  DELETE /api-keys/me
+```
+
+Desativa a chave enviada em `X-API-Key`.
+
+**Status:** `204` No Content · `401` Unauthorized · `403` Forbidden
+
+#### Get all API keys (admin)
+
+```http
+  GET /api-keys
+```
+
+**Status:** `200` OK · `401` Unauthorized · `403` Forbidden
+
+#### Get a specific API key (admin)
+
+```http
+  GET /api-keys/${id}
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id` | `integer` | **Required**. Id da chave |
+
+**Status:** `200` OK · `400` Bad Request · `401` Unauthorized · `403` Forbidden · `404` Not Found
+
+#### Revoke an API key (admin)
+
+```http
+  PUT /api-keys/${id}/revogar
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id` | `integer` | **Required**. Id da chave a revogar |
+
+**Status:** `200` OK · `400` Bad Request · `401` Unauthorized · `403` Forbidden · `404` Not Found
+
+#### Delete an API key (admin)
+
+```http
+  DELETE /api-keys/${id}
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id` | `integer` | **Required**. Id da chave a remover |
+
+**Status:** `204` No Content · `400` Bad Request · `401` Unauthorized · `403` Forbidden · `404` Not Found
 
 ## Termos de Serviço
 
