@@ -56,23 +56,23 @@ public class SwaggerConfig {
                         .name(ApiKeyFilter.HEADER)
                         .description("Chave de API. Obrigatória em POST, PUT e DELETE. Gere a sua em POST /api-keys (rota aberta)")))
                 .info(new Info()
-                .title("Limbus API")
-                .version("2.0.0")
-                .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
-                        + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.\n\n"
-                        + "**Recursos avançados:** todo POST exige o cabeçalho X-Idempotency-Key (idempotência); há limite de requisições por IP (token bucket, 429 com Retry-After); "
-                        + "a API é versionada pelo cabeçalho X-API-Version (escolha a versão no seletor \"Select a definition\", no topo); e o CORS libera apenas as origens configuradas.\n\n"
-                        + "**Autenticação:** as leituras (GET) são livres. POST, PUT e DELETE exigem uma chave de API válida no cabeçalho X-API-Key "
-                        + "(clique em \"Authorize\" e informe a chave). Qualquer pessoa gera a sua chave em POST /api-keys, informando nome e e-mail; "
-                        + "cada usuário consulta e revoga a própria em /api-keys/me, e só a chave de administrador lista e revoga as dos outros.")
-                .termsOfService("https://github.com/Kaicius/limbus-api#termos-de-servi%C3%A7o")
-                .contact(new Contact()
-                        .name("Kaio Alves")
-                        .email("kaioalvesesousa@gmail.com")
-                        .url("https://github.com/Kaicius"))
-                .license(new License()
-                        .name("MIT License")
-                        .url("https://opensource.org/licenses/MIT")))
+                        .title("Limbus API")
+                        .version("2.0.0")
+                        .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
+                                + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.\n\n"
+                                + "**Recursos avançados:** todo POST exige o cabeçalho X-Idempotency-Key (idempotência); há limite de requisições por IP (token bucket, 429 com Retry-After); "
+                                + "a API é versionada pelo cabeçalho X-API-Version (escolha a versão no seletor \"Select a definition\", no topo); e o CORS libera apenas as origens configuradas.\n\n"
+                                + "**Autenticação:** as leituras (GET) são livres. POST, PUT e DELETE exigem uma chave de API válida no cabeçalho X-API-Key "
+                                + "(clique em \"Authorize\" e informe a chave). Qualquer pessoa gera a sua chave em POST /api-keys, informando nome e e-mail; "
+                                + "cada usuário consulta e revoga a própria em /api-keys/me, e só a chave de administrador lista e revoga as dos outros.")
+                        .termsOfService("https://github.com/Kaicius/limbus-api#termos-de-servi%C3%A7o")
+                        .contact(new Contact()
+                                .name("Kaio Alves")
+                                .email("kaioalvesesousa@gmail.com")
+                                .url("https://github.com/Kaicius"))
+                        .license(new License()
+                                .name("MIT License")
+                                .url("https://opensource.org/licenses/MIT")))
                 .tags(List.of(
                         new Tag().name("Sinners").description("Gerenciamento dos 12 Sinners da Limbus Company, os personagens jogáveis aos quais as Identities pertencem"),
                         new Tag().name("Tags").description("Gerenciamento das Tags temáticas das Identities, como 'The House of Spiders' ou 'The Pinky'"),
@@ -172,7 +172,6 @@ public class SwaggerConfig {
                 .filter(p -> ApiVersionConfig.HEADER.equals(p.getName()))
                 .findFirst().orElse(null);
 
-        boolean temVersoesDiferentes = cabecalho != null;
         if (cabecalho == null) {
             cabecalho = new HeaderParameter()
                     .name(ApiVersionConfig.HEADER)
@@ -180,9 +179,12 @@ public class SwaggerConfig {
                     .description("Versão da API. Opcional: este endpoint responde igual nas versões 1 e 2. "
                             + "Sem o cabeçalho vale a versão 1; uma versão inexistente (ex.: 3) devolve 400");
             operacao.addParametersItem(cabecalho);
+        } else {
+            cabecalho.required(false)
+                    .description("Versão da API. Este endpoint muda conforme a versão: 1 devolve a identity simples "
+                            + "e 2 devolve a ficha completa. Sem o cabeçalho vale a versão 1; uma versão inexistente (ex.: 3) devolve 400");
         }
-        List<String> valores = temVersoesDiferentes ? List.of(versao) : List.of("1", "2");
-        cabecalho.setSchema(new StringSchema()._enum(new ArrayList<>(valores))._default(versao));
+        cabecalho.setSchema(new StringSchema()._enum(new ArrayList<>(List.of("1", "2")))._default(versao));
     }
 
     private static void documentarRateLimit(Operation operacao) {
