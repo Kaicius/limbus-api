@@ -1,9 +1,12 @@
 package com.kaio.limbus_api.config;
 
+import com.kaio.limbus_api.filter.ApiKeyFilter;
 import com.kaio.limbus_api.filter.IdempotencyFilter;
 import com.kaio.limbus_api.filter.RateLimitFilter;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
@@ -19,6 +22,8 @@ import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.tags.Tag;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -35,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.Comparator;
 import java.util.List;
 
@@ -43,13 +49,22 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI limbusOpenAPI() {
-        return new OpenAPI().info(new Info()
+        return new OpenAPI()
+                .components(new Components().addSecuritySchemes(ESQUEMA_DE_CHAVE, new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.HEADER)
+                        .name(ApiKeyFilter.HEADER)
+                        .description("Chave de API. Obrigatória em POST, PUT e DELETE. Gere a sua em POST /api-keys (rota aberta)")))
+                .info(new Info()
                 .title("Limbus API")
                 .version("2.0.0")
                 .description("API REST estilo wiki da Limbus Company: Sinners, Identities, Tags, Skills, Passivas, Stats e Sanity. "
                         + "Todas as listagens são paginadas (page, size, sort), cada recurso traz links HATEOAS (_links com self, update e delete) e os erros seguem o formato padrão ErrorResponse.\n\n"
                         + "**Recursos avançados:** todo POST exige o cabeçalho X-Idempotency-Key (idempotência); há limite de requisições por IP (token bucket, 429 com Retry-After); "
-                        + "a API é versionada pelo cabeçalho X-API-Version (escolha a versão no seletor \"Select a definition\", no topo); e o CORS libera apenas as origens configuradas.")
+                        + "a API é versionada pelo cabeçalho X-API-Version (escolha a versão no seletor \"Select a definition\", no topo); e o CORS libera apenas as origens configuradas.\n\n"
+                        + "**Autenticação:** as leituras (GET) são livres. POST, PUT e DELETE exigem uma chave de API válida no cabeçalho X-API-Key "
+                        + "(clique em \"Authorize\" e informe a chave). Qualquer pessoa gera a sua chave em POST /api-keys, informando nome e e-mail; "
+                        + "cada usuário consulta e revoga a própria em /api-keys/me, e só a chave de administrador lista e revoga as dos outros.")
                 .termsOfService("https://github.com/Kaicius/limbus-api#termos-de-servi%C3%A7o")
                 .contact(new Contact()
                         .name("Kaio Alves")
@@ -65,12 +80,17 @@ public class SwaggerConfig {
                         new Tag().name("Skills").description("Skills das Identities: três ataques e uma defesa, cada uma com pecado, moedas e variantes"),
                         new Tag().name("Passives").description("Passivas das Identities, de combate (BATTLE) ou de suporte (SUPPORT)"),
                         new Tag().name("Sanity").description("Informações de Sanity de cada Identity: descrição do Panic e o que aumenta ou diminui a Sanity. Cada Identity tem no máximo uma"),
-                        new Tag().name("Identity Stats").description("Atributos de combate de cada Identity (HP, velocidade, defesa, limiar de Stagger e resistências). Cada Identity tem no máximo um registro")
+                        new Tag().name("Identity Stats").description("Atributos de combate de cada Identity (HP, velocidade, defesa, limiar de Stagger e resistências). Cada Identity tem no máximo um registro"),
+                        new Tag().name("API Keys").description("Chaves de API: qualquer pessoa gera a sua, cada usuário consulta e revoga a própria, e o administrador gerencia todas")
                 ));
     }
 
     private static final List<String> ORDEM_TAGS = List.of(
-            "Sinners", "Tags", "Identities", "Skills", "Passives", "Sanity", "Identity Stats");
+            "Sinners", "Tags", "Identities", "Skills", "Passives", "Sanity", "Identity Stats", "API Keys");
+
+    private static final String ESQUEMA_DE_CHAVE = "ApiKeyAuth";
+    private static final Set<PathItem.HttpMethod> METODOS_DE_ESCRITA = Set.of(
+            PathItem.HttpMethod.POST, PathItem.HttpMethod.PUT, PathItem.HttpMethod.PATCH, PathItem.HttpMethod.DELETE);
 
     @Bean
     public GroupedOpenApi apiV1() {
@@ -110,16 +130,38 @@ public class SwaggerConfig {
     private OpenApiCustomizer documentarRecursosAvancados(String versao) {
         return openApi -> {
             if (openApi.getPaths() == null) return;
-            openApi.getPaths().values().forEach(caminho -> {
-                caminho.readOperations().forEach(operacao -> {
+            openApi.getPaths().forEach((rota, caminho) -> {
+                boolean rotaDeChaves = rota.startsWith(ApiKeyFilter.ROTA_DE_CHAVES);
+                boolean propriaChave = rota.equals(ApiKeyFilter.ROTA_DA_PROPRIA_CHAVE);
+                caminho.readOperationsMap().forEach((metodo, operacao) -> {
                     documentarVersao(operacao, versao);
                     documentarRateLimit(operacao);
+                    boolean cadastro = rota.equals(ApiKeyFilter.ROTA_DE_CHAVES) && metodo == PathItem.HttpMethod.POST;
+                    if (!cadastro && (rotaDeChaves || METODOS_DE_ESCRITA.contains(metodo))) {
+                        documentarChaveDeApi(operacao, rotaDeChaves && !propriaChave);
+                    }
                 });
                 if (caminho.getPost() != null) {
                     documentarIdempotencia(caminho.getPost());
                 }
             });
         };
+    }
+
+    private static void documentarChaveDeApi(Operation operacao, boolean somenteAdministrador) {
+        if (operacao.getSecurity() == null || operacao.getSecurity().isEmpty()) {
+            operacao.addSecurityItem(new SecurityRequirement().addList(ESQUEMA_DE_CHAVE));
+        }
+        adicionarResposta(operacao, "401",
+                "Unauthorized – Cabeçalho X-API-Key ausente, ou chave inválida ou revogada",
+                "Sem chave de API",
+                exemploDeErro(401, "Unauthorized", "Chave de API ausente: envie uma chave válida no cabeçalho X-API-Key"));
+        if (somenteAdministrador) {
+            adicionarResposta(operacao, "403",
+                    "Forbidden – A chave é válida, mas não é a de administrador",
+                    "Chave sem permissão",
+                    exemploDeErro(403, "Forbidden", "Somente a chave de administrador pode gerenciar as chaves de outros usuários"));
+        }
     }
 
     private static void documentarVersao(Operation operacao, String versao) {

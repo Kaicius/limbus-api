@@ -24,7 +24,7 @@ public class LimbusCorsFilter extends CorsFilter {
         config.setAllowedOrigins(origensPermitidas);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Content-Type", "Accept",
-                IdempotencyFilter.HEADER, ApiVersionConfig.HEADER));
+                IdempotencyFilter.HEADER, ApiVersionConfig.HEADER, ApiKeyFilter.HEADER));
         config.setExposedHeaders(List.of("Location", "Retry-After",
                 RateLimitFilter.HEADER_LIMITE, RateLimitFilter.HEADER_RESTANTE,
                 IdempotencyFilter.HEADER_REPLAY));

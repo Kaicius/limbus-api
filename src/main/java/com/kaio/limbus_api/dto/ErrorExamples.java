@@ -24,6 +24,15 @@ public final class ErrorExamples {
     public static final String NOT_FOUND_IDENTITY = """
             {"status": 404, "erro": "Not Found", "mensagem": "Identity não encontrado(a) com id: 99", "timestamp": "2026-10-08T00:54:40"}""";
 
+    public static final String BAD_REQUEST_EMAIL = """
+            {"status": 400, "erro": "Bad Request", "mensagem": "email: deve ser um endereço de e-mail bem formado", "timestamp": "2026-10-08T00:54:40"}""";
+
+    public static final String FORBIDDEN_ADMIN_SEM_CADASTRO = """
+            {"status": 403, "erro": "Forbidden", "mensagem": "A chave de administrador não tem cadastro próprio: use uma chave de usuário nesta rota", "timestamp": "2026-10-08T00:54:40"}""";
+
+    public static final String NOT_FOUND_API_KEY = """
+            {"status": 404, "erro": "Not Found", "mensagem": "Chave de API não encontrado(a) com id: 99", "timestamp": "2026-10-08T00:54:40"}""";
+
     public static final String CONFLICT = """
             {"status": 409, "erro": "Conflict", "mensagem": "Operação viola uma regra de integridade (valor duplicado ou registro em uso)", "timestamp": "2026-10-08T00:54:40"}""";
 
